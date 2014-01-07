@@ -29,9 +29,9 @@ module Spree
       def avatax_compute_order(order)
         # Use Avatax lookup and if fails fall back to default Spree taxation rules
         begin
-          Avalara.password = AvataxConfig.password
-          Avalara.username = AvataxConfig.username
-          Avalara.endpoint = AvataxConfig.endpoint
+          Avalara.password = SpreeAvatax::Config.password
+          Avalara.username = SpreeAvatax::Config.username
+          Avalara.endpoint = SpreeAvatax::Config.endpoint
           
           matched_line_items = order.line_items.select do |line_item|
             line_item.product.tax_category == rate.tax_category
@@ -70,7 +70,7 @@ module Spree
             :customer_code => order.email,
             :doc_date => Date.today,
             :doc_type => 'SalesOrder',
-            :company_code => AvataxConfig.company_code,
+            :company_code => SpreeAvatax::Config.company_code,
             :doc_code => order.number
           )
 
@@ -84,6 +84,7 @@ module Spree
           # Log Response
           logger.debug invoice_tax.to_s
           invoice_tax.total_tax
+
         rescue => e
           notify(e, order)
           compute_order(order)
@@ -98,6 +99,10 @@ module Spree
       # Notify a Honeybadger that Avalara is down.... :(
       #
       def notify(e, order)
+        # Allow certain errors to be not be raised to the alert framework
+        # https://github.com/adamfortuna/avalara/blob/master/lib/avalara.rb#L96-L102
+        return if e.instance_of?(Avalara::ApiError) && SpreeAvatax::Config.suppress_api_errors?
+
         alert_params = {
           :error_class   => "Avalara Error: #{e.class}",
           :error_message => "Avalara Error: #{e.message}",

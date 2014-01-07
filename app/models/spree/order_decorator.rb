@@ -7,9 +7,9 @@ module Spree
 
     def commit_avatax_invoice
       begin
-        Avalara.password = AvataxConfig.password
-        Avalara.username = AvataxConfig.username
-        Avalara.endpoint = AvataxConfig.endpoint
+        Avalara.password = SpreeAvatax::Config.password
+        Avalara.username = SpreeAvatax::Config.username
+        Avalara.endpoint = SpreeAvatax::Config.endpoint
 
         # Only send the line items that return true for avataxable
         matched_line_items = self.line_items.select do |line_item|
@@ -46,7 +46,7 @@ module Spree
           :customer_code => self.email,
           :doc_date => Date.today,
           :doc_type => 'SalesInvoice',
-          :company_code => AvataxConfig.company_code,
+          :company_code => SpreeAvatax::Config.company_code,
           :doc_code => self.number,
           :commit => 'true'
           )
@@ -54,22 +54,24 @@ module Spree
         invoice.addresses = invoice_addresses
         invoice.lines = invoice_lines
         
-        #Log request
+        # Log request
         logger.debug 'Avatax Request - '
         logger.debug invoice.to_s
 
         invoice_tax = Avalara.get_tax(invoice)
         
-        #Log Response
+        # Log Response
         logger.debug 'Avatax Response - '
         logger.debug invoice_tax.to_s
 
       rescue => error
-        puts error.backtrace.split('\n')
-        raise error if Rails.env.test?
-        logger.warn 'Avatax Commit Failed!'
-        logger.warn error.to_s
+        handle_error(error)
       end
+    end
+
+    def handle_error(error) 
+      logger.warn 'Avatax Commit Failed!'
+      logger.warn error.to_s
     end
   end
 end
