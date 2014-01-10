@@ -1,8 +1,6 @@
 Spree Avatax
 ===========
 
-Introduction goes here.
-
 This is an update to the original Spree Avatax gem (https://github.com/markalinn/Spree-Avatax) to work with Spree 2.1.x.
 
 Changes
