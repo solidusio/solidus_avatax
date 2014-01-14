@@ -6,4 +6,5 @@ config = YAML.load(yaml)[Rails.env]
 SpreeAvatax::Config.username = config['username']
 SpreeAvatax::Config.password = config['password']
 SpreeAvatax::Config.company_code = config['company_code']
-SpreeAvatax::Config.suppress_api_errors = true
+SpreeAvatax::Config.endpoint = config['endpoint']
+SpreeAvatax::Config.suppress_api_errors = false
