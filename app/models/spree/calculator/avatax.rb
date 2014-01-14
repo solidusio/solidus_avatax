@@ -11,6 +11,10 @@ module Spree
         I18n.t(:avalara_tax)
       end
 
+      def logger
+        @@logger ||= Logger.new("#{Rails.root}/log/avatax.log")
+      end
+
       def compute(computable)
         case computable
           when Spree::Order
