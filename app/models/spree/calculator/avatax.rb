@@ -90,6 +90,7 @@ module Spree
           invoice_tax.total_tax
 
         rescue => e
+          logger.error(e)
           notify(e, order)
           compute_order(order)
         end
@@ -124,8 +125,6 @@ module Spree
         if defined?(Pagerduty) && pager_duty_client
           pager_duty_client.trigger "Avalara Error #{e.class}", alert_params
         end
-
-        logger.warn e.inspect
       end
     end
   end

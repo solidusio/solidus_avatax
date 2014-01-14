@@ -70,8 +70,8 @@ module Spree
     end
 
     def handle_error(error) 
-      logger.warn 'Avatax Commit Failed!'
-      logger.warn error.to_s
+      logger.error 'Avatax Commit Failed!'
+      logger.error error.to_s
     end
   end
 end
