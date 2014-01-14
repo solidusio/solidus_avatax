@@ -11,8 +11,8 @@ module Spree
         I18n.t(:avalara_tax)
       end
 
-      def logger
-        @@logger ||= Logger.new("#{Rails.root}/log/avatax.log")
+      def avatax_logger
+        @@avatax_logger ||= Logger.new("#{Rails.root}/log/avatax.log")
       end
 
       def compute(computable)
@@ -68,7 +68,7 @@ module Spree
           invoice_addresses << invoice_address
 
           # Log Order State
-          logger.debug order.state
+          avatax_logger.debug order.state
           
           invoice = Avalara::Request::Invoice.new(
             :customer_code => order.email,
@@ -82,15 +82,15 @@ module Spree
           invoice.lines = invoice_lines
           
           # Log request
-          logger.debug invoice.to_s
+          avatax_logger.debug invoice.to_s
           invoice_tax = Avalara.get_tax(invoice)
           
           # Log Response
-          logger.debug invoice_tax.to_s
+          avatax_logger.debug invoice_tax.to_s
           invoice_tax.total_tax
 
         rescue => e
-          logger.error(e)
+          avatax_logger.error(e)
           notify(e, order)
           compute_order(order)
         end
