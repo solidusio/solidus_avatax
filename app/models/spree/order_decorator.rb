@@ -58,6 +58,9 @@ module Spree
         logger.debug 'Avatax Request - '
         logger.debug invoice.to_s
 
+        # Indicate this was avataxed
+        update_attribute(:avatax_response_at, Time.now)
+
         invoice_tax = Avalara.get_tax(invoice)
         
         # Log Response

@@ -84,14 +84,19 @@ module Spree
           # Log request
           avatax_logger.debug invoice.to_s
           invoice_tax = Avalara.get_tax(invoice)
-          
-          # Log Response
+         
+          # Indicate this order was Avatax calculated 
+          order.update_attribute(:avatax_response_at, Time.now)
+
+          # Log response
           avatax_logger.debug invoice_tax.to_s
           invoice_tax.total_tax
 
         rescue => e
           avatax_logger.error(e)
           notify(e, order)
+
+          order.update_attribute(:avatax_response_at, nil)
           compute_order(order)
         end
       end

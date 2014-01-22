@@ -15,5 +15,10 @@ describe Spree::Order do
     it 'should call Avatax.get_tax' do
       subject
     end
+
+    it 'should set avatax_response_at' do
+      subject
+      order.avatax_response_at.should_not be_nil
+    end
   end
 end

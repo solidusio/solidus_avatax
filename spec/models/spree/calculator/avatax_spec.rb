@@ -51,9 +51,12 @@ describe Spree::Calculator::Avatax do
   describe 'avatax_compute_order' do
     let(:invoice_tax) { double(Avalara::Response, total_tax: 5.00) }
     let(:pager_duty_client) { Pagerduty.new('PAGER DUTY KEY') }  
+    let(:order) do
+      FactoryGirl.create(:order, ship_address: FactoryGirl.create(:ship_address))
+    end
 
     subject do
-      calculator.send(:avatax_compute_order, FactoryGirl.create(:order, ship_address: FactoryGirl.create(:ship_address)))
+      calculator.send(:avatax_compute_order, order)
     end
 
     context 'when computing a Spree:Order' do
@@ -63,6 +66,11 @@ describe Spree::Calculator::Avatax do
 
       it 'should call Avalara.get_tax' do
         subject
+      end
+
+      it 'should set avatax_response_at' do
+        subject
+        order.avatax_response_at.should_not be_nil    
       end
     end
 
