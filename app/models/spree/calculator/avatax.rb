@@ -52,7 +52,8 @@ module Spree
               :destination_code => '1',
               :origin_code => '1',
               :qty => matched_line_item.quantity.to_s,
-              :amount => matched_line_amount.to_s
+              :amount => matched_line_amount.to_s,
+              :item_code => matched_line_item.variant.sku
             )
             invoice_lines << invoice_line                
           end

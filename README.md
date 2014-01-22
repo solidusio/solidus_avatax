@@ -27,30 +27,15 @@ config.spree.calculators.shipping_methods << Spree::Calculator::Avatax
 config.spree.calculators.promotion_actions_create_adjustments << Spree::Calculator::Avatax
 ```
 
-You will also need an avatax.yml file under config with your Avatax account information. A sample is below.
+You will also need to initialize a config object with your Avatax credentials as such:
+
 
 ```
-default: &default
-  username:     'YOUR ID'
-  password:     'YOUR LICENSE KEY'
-  endpoint:     'https://development.avalara.net/'
-  company_code: 'YOUR COMPANY'
-
-development:
-  <<: *default
-
-test: 
-  <<: *default
-
-staging: 
-  <<: *default
-
-integration: 
-  <<: *default
-
-production: 
-  <<: *default
-  endpoint:     'https://avatax.avalara.net/'
+SpreeAvatax::Config.username = ''
+SpreeAvatax::Config.password = ''
+SpreeAvatax::Config.company_code = ''
+SpreeAvatax::Config.endpoint = ''
+SpreeAvatax::Config.suppress_api_errors = true/false
 ```
 
 Admin Configuration
