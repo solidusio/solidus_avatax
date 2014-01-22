@@ -13,6 +13,8 @@ Changes
 * Introduced Pagerduty alerts for when code reverts to standard Spree behavior when Avalara goes down.
 * Very rough attempt to start adding test coverage.
 * Allow for selective suppression or raising of Avalara errors.
+* Indicate on Spree::Order whether the tax amount is from Avatax or not.
+* No longer require a config/avatax.yml for configuration.
 
 App Configuration
 -----------------
@@ -29,14 +31,15 @@ config.spree.calculators.promotion_actions_create_adjustments << Spree::Calculat
 
 You will also need to initialize a config object with your Avatax credentials as such:
 
-
 ```
-SpreeAvatax::Config.username = ''
-SpreeAvatax::Config.password = ''
-SpreeAvatax::Config.company_code = ''
-SpreeAvatax::Config.endpoint = ''
+SpreeAvatax::Config.username = 'YOUR USERNAME'
+SpreeAvatax::Config.password = 'YOUR PASSWORD'
+SpreeAvatax::Config.company_code = 'YOUR COMPANY'
+SpreeAvatax::Config.endpoint = 'PROD OR DEV ENDPOINT'
 SpreeAvatax::Config.suppress_api_errors = true/false
 ```
+
+It is left to for you to decide how this gets set, either as an environment initializer or via a Spree preference.
 
 Admin Configuration
 -------------------
@@ -54,24 +57,21 @@ To test, you will need a test application, then you can run the tests.
 bundle exec rake test_app
 ```
 
-Create a configuration file under spec/dummy/config/avatax.yml that looks like the following:
-
-```
-default: &default
-  username:       'Your ID'
-  password:       'Your License'
-  endpoint:       'https://development.avalara.net/'
-  company_code:   'Your Company'
-
-test:
-  <<: *default
-```
-
 Run tests!
 
 ```
 bundle exec rake spec
 ```
+
+Live tests are provided to insure that the Avalara gem works as promised. The credentials to successfully run the live tests are provided here under /etc/avalara_config.yml.
+
+```
+username: 'USERNAME'
+password: 'PASSWORD'
+company_code: 'COMPANY'
+```
+
+These tests will communicate against the test Avatax API.
 
 TODO
 ----
