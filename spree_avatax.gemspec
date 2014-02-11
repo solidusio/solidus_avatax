@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  s.add_dependency 'spree_core',  '~> 2.1'
+  s.add_dependency 'spree_core',  '~> 2.1.3'
   s.add_dependency 'avalara',     '~> 0.0.3'
   s.add_dependency 'hashie',      '~> 2.l.5'
   s.add_dependency 'multi_json'
