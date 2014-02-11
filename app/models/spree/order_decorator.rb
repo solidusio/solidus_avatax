@@ -30,7 +30,8 @@ module Spree
             :origin_code => '1',
             :qty => matched_line_item.quantity.to_s,
             :amount => matched_line_amount.to_s,
-            :item_code => matched_line_item.variant.sku
+            :item_code => matched_line_item.variant.sku,
+            :discounted => self.promotion_adjustment_total != 0 ? true : false
             )
           invoice_lines << invoice_line                
         end
@@ -51,6 +52,7 @@ module Spree
           :doc_type => 'SalesInvoice',
           :company_code => SpreeAvatax::Config.company_code,
           :doc_code => self.number,
+          :discount => self.promotion_adjustment_total.to_s,
           :commit => 'true'
           )
 
@@ -78,6 +80,16 @@ module Spree
     def handle_error(error) 
       logger.error 'Avatax Commit Failed!'
       logger.error error.to_s
+    end
+
+    ##
+    # Calculates the total discount of all eligible promotions for Avatax Discount
+    # http://developer.avalara.com/api-docs/avalara-avatax-api-reference
+    #
+    def promotion_adjustment_total 
+      return 0 if adjustments.nil?
+      total = adjustments.select { |i| i.eligible == true && i.originator_type.constantize == Spree::PromotionAction}.inject(0) { |sum, i| sum + i.amount.to_f }
+      total.abs 
     end
   end
 end

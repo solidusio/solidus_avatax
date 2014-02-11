@@ -53,7 +53,8 @@ module Spree
               :origin_code => '1',
               :qty => matched_line_item.quantity.to_s,
               :amount => matched_line_amount.to_s,
-              :item_code => matched_line_item.variant.sku
+              :item_code => matched_line_item.variant.sku,
+              :discounted => order.promotion_adjustment_total != 0 ? true : false
             )
             invoice_lines << invoice_line                
           end
@@ -76,6 +77,7 @@ module Spree
             :doc_date => Date.today,
             :doc_type => 'SalesOrder',
             :company_code => SpreeAvatax::Config.company_code,
+            :discount => order.promotion_adjustment_total.to_s,
             :doc_code => order.number
           )
 
