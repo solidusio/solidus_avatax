@@ -8,10 +8,14 @@ require 'yaml'
 describe Avalara do
   before do
     # Load the credentials from an external file
-    @avalara_config = YAML.load_file('/etc/avalara_config.yml')
-    Avalara.password = @avalara_config['password']
-    Avalara.username = @avalara_config['username']
-    Avalara.endpoint = 'https://development.avalara.net/'
+    begin
+      @avalara_config = YAML.load_file("#{File.dirname(__FILE__)}/avalara_config.yml")
+      Avalara.password = @avalara_config['password']
+      Avalara.username = @avalara_config['username']
+      Avalara.endpoint = 'https://development.avalara.net/'
+    rescue => e
+      pending("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
+    end
   end
 
   describe 'geographical_tax' do

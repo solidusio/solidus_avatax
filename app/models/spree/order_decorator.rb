@@ -3,83 +3,25 @@ module Spree
 
     Spree::Order.state_machine.after_transition :to => :complete, :do => :commit_avatax_invoice
 
-    #TODO-  Avatax Refunds!
+    def doc_type
+      'SalesInvoice'
+    end
 
-    #TODO: Findout what this TODO means
-    #TODO: Findout why we do this same logic pretty much twice with calculator/avatax.rb
-    def commit_avatax_invoice
-      begin
-        Avalara.password = SpreeAvatax::Config.password
-        Avalara.username = SpreeAvatax::Config.username
-        Avalara.endpoint = SpreeAvatax::Config.endpoint
+    def status_field
+      :avatax_invoice_at
+    end
 
-        # Only send the line items that return true for avataxable
-        matched_line_items = self.line_items.select do |line_item|
-          line_item.avataxable?
-        end
-            
-        invoice_lines =[]
-        line_count = 0
-
-        matched_line_items.each do |matched_line_item|
-          line_count = line_count + 1
-          matched_line_amount = matched_line_item.price * matched_line_item.quantity
-          invoice_line = Avalara::Request::Line.new(
-            :line_no => line_count.to_s,
-            :destination_code => '1',
-            :origin_code => '1',
-            :qty => matched_line_item.quantity.to_s,
-            :amount => matched_line_amount.to_s,
-            :item_code => matched_line_item.variant.sku,
-            :discounted => self.promotion_adjustment_total != 0 ? true : false
-            )
-          invoice_lines << invoice_line                
-        end
-
-        invoice_addresses = []
-        invoice_address = Avalara::Request::Address.new(
-          :address_code => '1',
-          :line_1 => self.ship_address.address1.to_s,
-          :line_2 => self.ship_address.address2.to_s,
-          :city => self.ship_address.city.to_s,
-          :postal_code => self.ship_address.zipcode.to_s
-          )
-        invoice_addresses << invoice_address
-
-        invoice = Avalara::Request::Invoice.new(
-          :customer_code => self.email,
-          :doc_date => Date.today,
-          :doc_type => 'SalesInvoice',
-          :company_code => SpreeAvatax::Config.company_code,
-          :doc_code => self.number,
-          :discount => self.promotion_adjustment_total.to_s,
-          :commit => 'true'
-          )
-
-        invoice.addresses = invoice_addresses
-        invoice.lines = invoice_lines
-        
-        # Log request
-        logger.debug 'Avatax Request - '
-        logger.debug invoice.to_s
-
-        # Indicate this was avataxed
-        update_attribute(:avatax_response_at, Time.now)
-
-        invoice_tax = Avalara.get_tax(invoice)
-        
-        # Log Response
-        logger.debug 'Avatax Response - '
-        logger.debug invoice_tax.to_s
-
-      rescue => error
-        handle_error(error)
+    def build_line_items(order)
+      # Only send the line items that return true for avataxable
+      order.line_items.select do |line_item|
+        line_item.avataxable?
       end
     end
 
-    def handle_error(error) 
-      logger.error 'Avatax Commit Failed!'
-      logger.error error.to_s
+    ##
+    # This method sends an invoice to Avalara which is stored in their system.
+    def commit_avatax_invoice
+      SpreeAvatax::AvataxComputer.new.compute_order_with_context(self, self)
     end
 
     ##

@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe Spree::Calculator::Avatax do
   let(:calculator) { Spree::Calculator::Avatax.new }
-  let(:tax_rate) { double(Spree::TaxRate, amount: 50.00, tax_category: 'Foo') }
+  let(:tax_category) { 'Foo' }
+  let(:tax_rate) { double(Spree::TaxRate, amount: 50.00, tax_category: tax_category) }
 
   describe 'Avatax.description' do
     it 'should not be nil' do
@@ -48,94 +49,47 @@ describe Spree::Calculator::Avatax do
     end  
   end
 
+  describe 'build_line_items' do
+    let(:order) { create :order_with_line_items }
+
+    before do
+      order.line_items.each do |line_item|
+        line_item.product.stub(:tax_category).and_return(tax_category)
+      end
+      calculator.should_receive(:rate).at_least(order.line_items.size).and_return(tax_rate)
+    end
+
+    it 'should return all line items' do
+      calculator.build_line_items(order).size.should == order.line_items.size 
+    end
+  end
+
+  describe 'doc_type' do
+    it 'should return SalesInvoice' do
+      calculator.doc_type.should == 'SalesOrder'
+    end
+  end
+
+  describe 'status_field' do
+    it 'should return :avatax_invoice_at' do
+      calculator.status_field.should == :avatax_response_at
+    end
+  end
+
   describe 'avatax_compute_order' do
-    let(:invoice_tax) { double(Avalara::Response, total_tax: 5.00) }
-    let(:pager_duty_client) { Pagerduty.new('PAGER DUTY KEY') }  
-    let(:order) do
-      FactoryGirl.create(:order, ship_address: FactoryGirl.create(:ship_address))
-    end
+    let(:order) { create :order }
 
-    subject do
-      calculator.send(:avatax_compute_order, order)
-    end
+    subject { calculator.send(:avatax_compute_order, order) }
 
-    context 'when computing a Spree:Order' do
-      before do
-        Avalara.should_receive(:get_tax).once.and_return(invoice_tax)
-      end
-
-      it 'should call Avalara.get_tax' do
-        subject
-      end
-
-      it 'should set avatax_response_at' do
-        subject
-        order.avatax_response_at.should_not be_nil    
-      end
-    end
-
-    context 'when Avalara::ApiError is raised' do
-      context 'when suppress_api_errors is true' do
-        before do
-          calculator.should_receive(:rate).once.and_return(tax_rate)
-          Avalara.should_receive(:get_tax).once.and_raise(Avalara::ApiError.new)
-          SpreeAvatax::Config.should_receive(:suppress_api_errors?).and_return(true)
-        end
-
-        it 'should not notify Honeybadger' do
-          Honeybadger.should_receive(:notify).never
-          subject
-        end
-
-        it 'should not notify Pagerduty' do
-          pager_duty_client.should_receive(:trigger).never
-          calculator.pager_duty_client = pager_duty_client
-          subject
-        end
-      end
-
-      context 'when suppress_api_errors is false' do
-        before do
-          calculator.should_receive(:rate).once.and_return(tax_rate)
-          Avalara.should_receive(:get_tax).once.and_raise(Avalara::ApiError.new)
-          SpreeAvatax::Config.should_receive(:suppress_api_errors?).and_return(false)
-        end
-
-        it 'should notify Honeybadger' do
-          Honeybadger.should_receive(:notify).once
-          subject
-        end
-
-        it 'should notify Pagerduty' do
-          pager_duty_client.should_receive(:trigger).once
-          calculator.pager_duty_client = pager_duty_client
-          subject
-        end
-      end
-    end
-
-    context 'when StandardError is raised' do
-      before do
-        calculator.should_receive(:rate).once.and_return(tax_rate)
-        Avalara.should_receive(:get_tax).once.and_raise('SOME AVALARA ERROR')
-      end
-
-      it 'should notify Honeybadger' do
-        Honeybadger.should_receive(:notify).once
-        subject
-      end
-
-      it 'should notify Pagerduty' do
-        pager_duty_client.should_receive(:trigger).once
-        calculator.pager_duty_client = pager_duty_client
-        subject
-      end
+    it 'should call SpreeAvatax::AvataxCalculator.compute_order' do
+      SpreeAvatax::AvataxComputer.any_instance.should_receive(:compute_order_with_context).once.with(order, calculator)
+      subject
     end
   end
 
   describe 'avatax_compute_line_item' do
     before do
-      calculator.should_receive(:rate).once.and_return(tax_rate)
+      calculator.should_receive(:rate).at_least(1).and_return(tax_rate)
     end
 
     it 'should invoke Calculator::DefaultTax' do
