@@ -3,19 +3,6 @@ Spree Avatax
 
 This is an update to the original Spree Avatax gem (https://github.com/markalinn/Spree-Avatax) to work with Spree 2.1.x.
 
-Changes
--------
-
-* Update to use Spree Core 2.1.2 and generated with latest spree extension generator.
-* Update to to use latest Avalara gem (0.0.3) as a dependency and remove local Avalara code.
-* Update Hashie gem.
-* Introduced Honeybadger alerts for when code reverts to standard Spree behavior when Avalara goes down.
-* Introduced Pagerduty alerts for when code reverts to standard Spree behavior when Avalara goes down.
-* Very rough attempt to start adding test coverage.
-* Allow for selective suppression or raising of Avalara errors.
-* Indicate on Spree::Order whether the tax amount is from Avatax or not.
-* No longer require a config/avatax.yml for configuration.
-
 App Configuration
 -----------------
 
@@ -63,7 +50,7 @@ Run tests!
 bundle exec rake spec
 ```
 
-Live tests are provided to insure that the Avalara gem works as promised. The credentials to successfully run the live tests are provided here under /etc/avalara_config.yml.
+Live tests are provided to insure that the Avalara gem works as promised. The credentials must be provided under spec/live to run them successfully. See the example .yml for guidance.
 
 ```
 username: 'USERNAME'
@@ -72,11 +59,6 @@ company_code: 'COMPANY'
 ```
 
 These tests will communicate against the test Avatax API.
-
-TODO
-----
-
-* Understand the impact of this TODO from the original author, https://github.com/HoyaBoya/Spree-Avatax/blob/master/app/models/spree/calculator/avatax.rb#L99
 
 Installation
 ------------
