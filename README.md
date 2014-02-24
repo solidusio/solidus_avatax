@@ -3,19 +3,6 @@ Spree Avatax
 
 This is an update to the original Spree Avatax gem (https://github.com/markalinn/Spree-Avatax) to work with Spree 2.1.x.
 
-Changes
--------
-
-* Update to use Spree Core 2.x.
-* Update to to use latest Avalara gem (0.0.3) as a dependency and remove local Avalara code.
-* Update Hashie gem.
-* Introduced Honeybadger alerts for when code reverts to standard Spree behavior when Avalara goes down.
-* Very rough attempt to start adding test coverage.
-* Allow for selective suppression or raising of Avalara errors.
-* Pass discount information for proper tax calculation with discounts.
-* Remove suppression of all exceptions and return 0 for failed calculations instead of using default tax calculator.
-* Impose of DRYmess to order_decorator and calculator.
-
 App Configuration
 -----------------
 
