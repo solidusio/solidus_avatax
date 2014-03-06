@@ -53,8 +53,8 @@ describe Spree::Order do
 
     context 'when there are eligible adjustments' do
       before do
-        order.adjustments << Spree::Adjustment.create!(originator_type: "Spree::PromotionAction", eligible: false, amount: -5.0, order: order, label: 'Promo One')
-        order.adjustments << Spree::Adjustment.create!(originator_type: "Spree::PromotionAction", eligible: true, amount: -10.99, order: order, label: 'Promo Two')
+        order.adjustments << Spree::Adjustment.create!(source_type: "Spree::PromotionAction", eligible: false, amount: -5.0, order: order, label: 'Promo One')
+        order.adjustments << Spree::Adjustment.create!(source_type: "Spree::PromotionAction", eligible: true, amount: -10.99, order: order, label: 'Promo Two')
       end
 
       it 'should have a promotion_adjustment_total of 10.99' do
