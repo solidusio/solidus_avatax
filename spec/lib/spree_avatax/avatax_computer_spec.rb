@@ -6,7 +6,10 @@ describe SpreeAvatax::AvataxComputer do
   let(:tax_rate) { double(Spree::TaxRate, amount: 50.00, tax_category: 'Foo') }
   let(:invoice_tax) { double(Avalara::Response, total_tax: total_tax) }
   let(:order) { FactoryGirl.create(:order_with_line_items, ship_address: FactoryGirl.create(:ship_address)) }
-  let(:context) { order }
+  let(:context) do  
+    order.stub(:build_line_items).and_return(order.line_items)
+    order
+  end
 
   describe 'build_invoice_lines' do
     subject do
@@ -58,6 +61,21 @@ describe SpreeAvatax::AvataxComputer do
         lambda {
           subject 
         }.should raise_error
+      end
+    end
+
+    context 'when build_line_items returns blank' do
+      before do
+        context.stub(:build_line_items).and_return([])
+      end
+
+      it 'should not notify Honeybadger' do
+        Honeybadger.should_receive(:notify).never 
+        subject
+      end
+
+      it 'should return 0' do
+        subject.should == 0
       end
     end
 

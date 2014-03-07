@@ -23,6 +23,7 @@ module SpreeAvatax
         Avalara.endpoint = SpreeAvatax::Config.endpoint
         
         matched_line_items = context.build_line_items(order)
+        return DEFAULT_TAX_AMOUNT if matched_line_items.blank?
         
         invoice = build_invoice(order, context)
         invoice.addresses = build_invoice_addresses(order)
