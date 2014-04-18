@@ -20,6 +20,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'avalara',     '~> 0.0.3'
   s.add_dependency 'hashie',      '~> 2.l.5'
   s.add_dependency 'multi_json'
+  # temporary workaround. see here: https://github.com/spree/spree/issues/4517#issuecomment-39105212
+  # it was causing this spec failure: https://gist.github.com/jordan-brough/8e323aac89d4ab472e7a
+  s.add_dependency 'money',       '6.0.1'
 
   s.add_development_dependency 'rails',   '~>4.0.3'
 
