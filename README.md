@@ -6,7 +6,7 @@ This is an update to the original Spree Avatax gem (https://github.com/markalinn
 App Configuration
 -----------------
 
-Unlike the old gem which used a Rails installation generator, the new Avatax calculator can be integrated via the prescribed Spree 2.1.x method of adding to the calculators array in your configuration file, http://guides.spreecommerce.com/developer/calculators.html.
+Unlike the old gem which used a Rails installation generator, the new Avatax calculator can be integrated via the prescribed Spree 2.2.x method of adding to the calculators array in your configuration file, http://guides.spreecommerce.com/developer/calculators.html.
 
 ```
 # inside config/initializers/spree.rb

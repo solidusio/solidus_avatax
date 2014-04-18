@@ -1,52 +1,36 @@
 require_dependency 'spree/calculator'
 
+#
+# This is a no-op calculator that just returns the existing value.
+# We hook our tax calculations in SpreeAvatax::TaxComputer at the order level instead of here at the line item level
+#
+
 module Spree
-  class Calculator < ActiveRecord::Base
-    class Avatax < Calculator
-      attr_accessor :pager_duty_client
+  class Calculator::Avatax < Calculator
+    class TooManyPossibleAdjustments < StandardError; end
 
-      include Spree::Calculator::DefaultTaxMethods
-      
-      def self.description
-        I18n.t(:avalara_tax)
-      end
+    def self.description
+      Spree.t(:avatax_description)
+    end
 
-      def compute(computable)
-        case computable
-          when Spree::Order
-            avatax_compute_order(computable)
-          when Spree::LineItem
-            avatax_compute_line_item(computable)
-        end
-      end
+    ##
+    # We need to return the original adjustment amount of tax amount.
+    # This is invoked:
+    # https://github.com/spree/spree/blob/bd437de/core/app/models/spree/adjustment.rb#L76-L89
+    # Via:
+    # https://github.com/spree/spree/blob/bd437de/core/app/models/spree/item_adjustments.rb#L41-L42
+    #
+    # We are supporting this as a calculator so that a Spree TaxRate can be created with this calculator to complete the object graph.
+    # If we return 0 or anything else, we will be clobbering the taxes we just calculated from Avatax :/
+    #
+    def compute_line_item(line_item)
+      return 0 if line_item.adjustments.eligible.tax.additional.empty?
+      raise TooManyPossibleAdjustments if line_item.adjustments.eligible.tax.additional.size > 1
+      line_item.adjustments.eligible.tax.additional.first.amount
+    end
 
-      def doc_type
-        'SalesOrder'
-      end
-
-      def status_field
-        :avatax_response_at
-      end
-
-      def build_line_items(order)
-        order.line_items.select do |line_item|
-          line_item.product.tax_category == rate.tax_category
-        end
-      end
-  
-      private
-  
-      def rate
-        self.calculable
-      end
-
-      def avatax_compute_order(order)
-        SpreeAvatax::AvataxComputer.new.compute_order_with_context(order, self)
-      end
-  
-      def avatax_compute_line_item(line_item)
-        compute_line_item(line_item)
-      end
+    def compute_shipment(shipping_rate)
+      raise NotImplementedError
     end
   end
 end

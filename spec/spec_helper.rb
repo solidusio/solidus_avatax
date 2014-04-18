@@ -41,6 +41,12 @@ require 'spree/testing_support/url_helpers'
 
 # Requires factories defined in lib/spree_avatax/factories.rb
 require 'spree_avatax/factories'
+require 'vcr'
+
+VCR.configure do |c|
+  c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+  c.hook_into :webmock # or :fakeweb
+end
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods

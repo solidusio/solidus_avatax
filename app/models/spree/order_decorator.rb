@@ -1,37 +1,35 @@
-module Spree
-  Order.class_eval do
+Spree::Order.class_eval do
 
-    Spree::Order.state_machine.after_transition :to => :complete, :do => :commit_avatax_invoice
+  ##
+  # Possible order states
+  # http://guides.spreecommerce.com/user/order_states.html
 
-    def doc_type
-      'SalesInvoice'
-    end
+  # Send Avatax the invoice after ther order is complete and ask them to store it
+  Spree::Order.state_machine.after_transition :to => :complete, :do => :commit_avatax_invoice
 
-    def status_field
-      :avatax_invoice_at
-    end
+  # Ensure that tax is recalculated one final time before completing the order
+  # This is also what ends up triggering tax calculation after the first time an address is added
+  Spree::Order.state_machine.after_transition :to => :confirm, :do => :avatax_compute_tax
 
-    def build_line_items(order)
-      # Only send the line items that return true for avataxable
-      order.line_items.select do |line_item|
-        line_item.avataxable?
-      end
-    end
+  def avataxable?
+    line_items.present? && ship_address.present?
+  end
 
-    ##
-    # This method sends an invoice to Avalara which is stored in their system.
-    def commit_avatax_invoice
-      SpreeAvatax::AvataxComputer.new.compute_order_with_context(self, self)
-    end
+  def promotion_adjustment_total
+    adjustments.promotion.eligible.sum(:amount).abs
+  end
 
-    ##
-    # Calculates the total discount of all eligible promotions for Avatax Discount
-    # http://developer.avalara.com/api-docs/avalara-avatax-api-reference
-    #
-    def promotion_adjustment_total 
-      return 0 if adjustments.nil?
-      total = adjustments.promotion.eligible.sum(:amount)
-      total.abs
-    end
+  private
+
+  ##
+  # This method sends an invoice to Avalara which is stored in their system.
+  def commit_avatax_invoice
+    SpreeAvatax::TaxComputer.new(self, { doc_type: 'SalesInvoice', status_field: :avatax_invoice_at }).compute
+  end
+
+  ##
+  # Comute avatax but do not commit it their db
+  def avatax_compute_tax
+     SpreeAvatax::TaxComputer.new(self).compute
   end
 end
