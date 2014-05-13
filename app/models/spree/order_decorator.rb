@@ -7,9 +7,8 @@ Spree::Order.class_eval do
   # Send Avatax the invoice after ther order is complete and ask them to store it
   Spree::Order.state_machine.after_transition :to => :complete, :do => :commit_avatax_invoice
 
-  # Ensure that tax is recalculated one final time before completing the order
-  # This is also what ends up triggering tax calculation after the first time an address is added
-  Spree::Order.state_machine.after_transition :to => :confirm, :do => :avatax_compute_tax
+  # Start calculating tax as soon as addresses are supplied
+  Spree::Order.state_machine.after_transition :from => :address, :do => :avatax_compute_tax
 
   def avataxable?
     line_items.present? && ship_address.present?
