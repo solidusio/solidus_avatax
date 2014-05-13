@@ -17,6 +17,22 @@ describe Spree::Calculator::Avatax do
     end
   end
 
+  describe '#compute_shipping_rate' do
+    context 'when shipping is zero' do
+      it 'should be zero' do
+        calculator.compute_shipping_rate(double(Spree::ShippingRate, cost: 0)).should == 0
+      end
+    end
+
+    context 'when shipping is not zero' do
+      it 'should raise NotImplementedError' do
+        lambda {
+          calculator.compute_shipping_rate(double(Spree::ShippingRate, cost: 10))
+        }.should raise_error(NotImplementedError)
+      end
+    end
+  end
+
   describe '#compute_line_item' do
     let(:line_item) { create :line_item }
 

@@ -29,6 +29,11 @@ module Spree
       line_item.adjustments.eligible.tax.additional.first.amount
     end
 
+    def compute_shipping_rate(shipping_rate)
+      return 0 if shipping_rate.cost == 0
+      raise NotImplementedError
+    end
+
     def compute_shipment(shipping_rate)
       raise NotImplementedError
     end
