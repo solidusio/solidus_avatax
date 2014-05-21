@@ -18,8 +18,6 @@ Spree::Order.class_eval do
     adjustments.promotion.eligible.sum(:amount).abs
   end
 
-  private
-
   ##
   # This method sends an invoice to Avalara which is stored in their system.
   def commit_avatax_invoice
