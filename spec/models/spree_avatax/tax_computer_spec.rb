@@ -18,6 +18,7 @@ describe SpreeAvatax::TaxComputer do
         line_item.adjustments.tax.size.should == 1
         line_item.adjustments.each do |adjustment|
           adjustment.source.should_not be_nil
+          adjustment.state.should == 'closed'
         end
       end
     end

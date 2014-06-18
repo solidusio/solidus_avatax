@@ -9,7 +9,7 @@ App Configuration
 Unlike the old gem which used a Rails installation generator, the new Avatax calculator can be integrated via the prescribed Spree 2.2.x method of adding to the calculators array in your configuration file, http://guides.spreecommerce.com/developer/calculators.html.
 
 ```
-# inside config/initializers/spree.rb
+### inside config/initializers/spree.rb:
 config = Rails.application.config
 config.spree.calculators.tax_rates << Spree::Calculator::Avatax
 config.spree.calculators.shipping_methods << Spree::Calculator::Avatax
@@ -27,6 +27,13 @@ SpreeAvatax::Config.suppress_api_errors = true/false
 ```
 
 It is left to for you to decide how this gets set, either as an environment initializer or via a Spree preference.
+
+Known Issues
+------------
+
+1. Shipping charges are *not* yet supported.  This is on the todo list.
+2. "Additional tax" (e.g. US taxes) *is* supported but "included tax" (e.g. VAT) is *not*.  This feature is not on the roadmap but we'd be willing to look at pull requests for it.
+3. Note for future development: There is currently a bug in Spree where the "open all adjustments" admin button doesn't work for line item adjustments. See [here](https://github.com/spree/spree/blob/v2.2.2/backend/app/controllers/spree/admin/orders_controller.rb#L103). If that bug were ever fixed, we'd want to monkey patch the controller action to prevent tax adjustments from ever being re-opened. We always want tax adjustments to be "closed", which tells Spree not to try to recalculate them automatically.
 
 Admin Configuration
 -------------------
