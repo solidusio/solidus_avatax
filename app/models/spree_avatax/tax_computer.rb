@@ -51,8 +51,8 @@ class SpreeAvatax::TaxComputer
   ##
   # Need to clean out old taxes and update to prevent the 10 to 1 "Jordan" bug.
   def reset_tax_attributes(order)
+    order.all_adjustments.tax.where(adjustable_type: "Spree::LineItem").destroy_all
     order.line_items.each do |line_item|
-      line_item.adjustments.tax.delete_all
       line_item.update_attributes!({
         additional_tax_total: 0,
         adjustment_total: 0,
