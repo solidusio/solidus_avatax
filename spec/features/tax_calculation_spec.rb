@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "Tax Calculation" do
   let(:address) { create(:address, address1: "35 Crosby St", city: "New York", zipcode: 10013) }
-  let(:tax_rate) { create(:tax_rate, calculator: Spree::Calculator::Avatax.new, zone: ZoneSupport.global_zone) }
+  let(:tax_rate) { create(:tax_rate, calculator: SpreeAvatax::Calculator.new, zone: ZoneSupport.global_zone) }
   let(:order) { create(:order_with_line_items, ship_address: address) }
 
   before do

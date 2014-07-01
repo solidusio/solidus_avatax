@@ -13,9 +13,9 @@ Unlike the old gem which used a Rails installation generator, the new Avatax cal
 ```
 ### inside config/initializers/spree.rb:
 config = Rails.application.config
-config.spree.calculators.tax_rates << Spree::Calculator::Avatax
-config.spree.calculators.shipping_methods << Spree::Calculator::Avatax
-config.spree.calculators.promotion_actions_create_adjustments << Spree::Calculator::Avatax
+config.spree.calculators.tax_rates << SpreeAvatax::Calculator
+config.spree.calculators.shipping_methods << SpreeAvatax::Calculator
+config.spree.calculators.promotion_actions_create_adjustments << SpreeAvatax::Calculator
 ```
 
 You will also need to initialize a config object with your Avatax credentials as such:
