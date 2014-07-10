@@ -33,7 +33,8 @@ Known Issues
 
 1. Shipping charges are *not* yet supported.  This is on the todo list.
 2. "Additional tax" (e.g. US taxes) *is* supported but "included tax" (e.g. VAT) is *not*.  This feature is not on the roadmap but we'd be willing to look at pull requests for it.
-3. Note for future development: There is currently a bug in Spree where the "open all adjustments" admin button doesn't work for line item adjustments. See [here](https://github.com/spree/spree/blob/v2.2.2/backend/app/controllers/spree/admin/orders_controller.rb#L103). If that bug were ever fixed, we'd want to monkey patch the controller action to prevent tax adjustments from ever being re-opened. We always want tax adjustments to be "closed", which tells Spree not to try to recalculate them automatically.
+3. Returns/Refunds/Exchanges are not currently being sent to Avatax.  This is on the todo list and will be worked during or soon after the returns & exchanges refactor that we're working on with Spree for Spree 2.4.
+4. Note for future development: There is currently a bug in Spree where the "open all adjustments" admin button doesn't work for line item adjustments. See [here](https://github.com/spree/spree/blob/v2.2.2/backend/app/controllers/spree/admin/orders_controller.rb#L103). If that bug were ever fixed, we'd want to monkey patch the controller action to prevent tax adjustments from ever being re-opened. We always want tax adjustments to be "closed", which tells Spree not to try to recalculate them automatically.
 
 Admin Configuration
 -------------------
