@@ -1,6 +1,8 @@
 Spree Avatax
 ===========
 
+[![Build Status](https://travis-ci.org/bonobos/spree_avatax.svg?branch=2-2-stable)](https://travis-ci.org/bonobos/spree_avatax)
+
 This is an update to the original Spree Avatax gem (https://github.com/markalinn/Spree-Avatax) to work with Spree 2.2.x.
 
 App Configuration
