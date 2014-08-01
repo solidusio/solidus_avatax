@@ -1,0 +1,117 @@
+module ReturnInvoiceSoapResponses
+  def return_invoice_gettax_response(doc_code, return_item_id, time = Time.now)
+    {
+      transaction_id: "4289094359310439",
+      result_code: "Success",
+      doc_id: '55527402',
+      doc_type: "ReturnInvoice",
+      doc_code: doc_code,
+      doc_date: time.to_date,
+      doc_status: "Saved",
+      reconciled: false,
+      timestamp: time,
+      total_amount: "-10",
+      total_discount: "0",
+      total_exemption: "-10",
+      total_taxable: "0",
+      total_tax: "0",
+      total_tax_calculated: "0",
+      hash_code: "0",
+      tax_lines: {
+        tax_line: {
+          no: return_item_id.to_s,
+          tax_code: "P0000000",
+          taxability: true,
+          boundary_level: "Zip5",
+          exemption: "-10",
+          discount: "0",
+          taxable: "0",
+          rate: "0",
+          tax: "-0.01",
+          tax_calculated: "-0.01",
+          tax_included: false,
+          tax_details: {
+            tax_detail: {
+              country: "US",
+              region: "AL",
+              juris_type: "State",
+              juris_code: "01",
+              tax_type: "Sales",
+              base: "0",
+              taxable: "0",
+              rate: "0",
+              tax: "-0.01",
+              tax_calculated: "-0.01",
+              non_taxable: "-10",
+              exemption: "0",
+              juris_name: "ALABAMA",
+              tax_name: "AL STATE TAX",
+              tax_authority_type: "45",
+              tax_group: nil,
+              rate_type: "G",
+              state_assigned_no: nil,
+            },
+          },
+          exempt_cert_id: "0",
+          tax_date: time.to_date,
+          reporting_date: time.to_date,
+          accounting_method: "Accrual",
+        },
+      },
+      tax_addresses: {
+        tax_address: {
+          address: "Northwest",
+          address_code: "1",
+          boundary_level: "2",
+          city: "Herndon",
+          country: "US",
+          postal_code: "35005",
+          region: "AL",
+          tax_region_id: "2052474",
+          juris_code: "0107300460",
+          latitude: nil,
+          longitude: nil,
+          geocode_type: "ZIP5Centroid",
+          validate_status: "HouseNotOnStreet",
+          distance_to_boundary: "0",
+        },
+      },
+      locked: false,
+      adjustment_reason: "0",
+      adjustment_description: nil,
+      version: "1",
+      tax_date: time.to_date,
+      tax_summary: nil,
+      volatile_tax_rates: false,
+      messages: [
+        {
+          summary: nil,
+          details: nil,
+          helplink: nil,
+          refersto: nil,
+          severity: nil,
+          source: nil,
+        },
+      ],
+    }
+  end
+
+  def return_invoice_posttax_response
+    {
+      transaction_id: "4289138364000017",
+      result_code:    "Success",
+      doc_id:         "55529724",
+
+      messages: [
+        {
+          summary:  nil,
+          details:  nil,
+          helplink: nil,
+          refersto: nil,
+          severity: nil,
+          source:   nil,
+        },
+      ],
+    }
+  end
+end

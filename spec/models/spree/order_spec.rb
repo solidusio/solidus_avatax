@@ -77,7 +77,7 @@ describe Spree::Order do
 
     it "commits the sales invoice" do
       expect(SpreeAvatax::SalesInvoice).to receive(:commit).with(subject)
-      subject.next!
+      subject.complete!
     end
   end
 

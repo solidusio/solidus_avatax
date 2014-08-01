@@ -63,6 +63,7 @@ RSpec.configure do |config|
   config.include ActionView::Context
   config.include SalesOrderSoapResponses
   config.include SalesInvoiceSoapResponses
+  config.include ReturnInvoiceSoapResponses
 
   # == Mock Framework
   #
