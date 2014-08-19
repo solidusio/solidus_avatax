@@ -1,8 +1,17 @@
 module SpreeAvatax
   class Engine < Rails::Engine
     require 'spree/core'
-    isolate_namespace Spree
+    isolate_namespace SpreeAvatax
     engine_name 'spree_avatax'
+
+    initializer 'spree_avatax.register.calculators', after: 'spree.register.calculators' do |app|
+      app.config.spree.calculators.tax_rates << SpreeAvatax::Calculator
+      app.config.spree.calculators.shipping_methods << SpreeAvatax::Calculator
+    end
+
+    initializer 'spree_avatax.promo.register.promotion.calculators', after: 'spree.promo.register.promotion.calculators' do |app|
+      app.config.spree.calculators.promotion_actions_create_adjustments << SpreeAvatax::Calculator
+    end
 
     config.autoload_paths += %W(#{config.root}/lib)
 

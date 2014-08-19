@@ -9,11 +9,11 @@ module SpreeAvatax
       end
 
       attr_accessor :company_code
-      attr_accessor :suppress_api_errors
 
-      def suppress_api_errors?
-        suppress_api_errors
-      end
+      # the "use_production_url" config will replace the "endpoint" config soon
+      attr_accessor :use_production_url
     end
+
+    self.use_production_url = false
   end
 end
