@@ -3,10 +3,11 @@ class SpreeAvatax::Invoice
   DESTINATION_CODE = "1"
   ORIGIN_CODE = "1"
 
-  attr_reader :order, :doc_type, :invoice, :logger
+  attr_reader :order, :doc_type, :commit, :invoice, :logger
 
-  def initialize(order, doc_type, logger = Logger.new(STDOUT))
+  def initialize(order, doc_type, commit, logger = Logger.new(STDOUT))
     @doc_type = doc_type
+    @commit = commit
     @order = order
     @logger = logger
     build_invoice
@@ -19,6 +20,7 @@ class SpreeAvatax::Invoice
       customer_code: order.email, # TODO why are we sending the email here ?!? shouldnt this be an ID instead?
       doc_date:      Date.today,
       doc_type:      doc_type,
+      commit:        commit,
       company_code:  SpreeAvatax::Config.company_code,
       discount:      order.promotion_adjustment_total.round(2).to_f,
       doc_code:      order.number,

@@ -1,13 +1,15 @@
 class SpreeAvatax::TaxComputer
   DEFAULT_DOC_TYPE = 'SalesOrder'
+  DEFAULT_COMMIT_STATE = false
   DEFAULT_STATUS_FIELD = :avatax_response_at
 
   class MissingTaxAmountError < StandardError; end
 
-  attr_reader :order, :doc_type, :status_field
+  attr_reader :order, :doc_type, :commit, :status_field
 
   def initialize(order, options = {})
     @doc_type     = options[:doc_type]     || DEFAULT_DOC_TYPE
+    @commit       = options[:commit]       || DEFAULT_COMMIT_STATE
     @status_field = options[:status_field] || DEFAULT_STATUS_FIELD
 
     @order = order
@@ -74,7 +76,7 @@ class SpreeAvatax::TaxComputer
   end
 
   def invoice_for_order
-    SpreeAvatax::Invoice.new(order, doc_type, logger).invoice
+    SpreeAvatax::Invoice.new(order, doc_type, commit, logger).invoice
   end
 
   def handle_avalara_error(e)

@@ -5,10 +5,11 @@ describe SpreeAvatax::Invoice do
   # TODO, turns this calculator into a NOOP
   let(:calculator) { Spree::Calculator::DefaultTax.new }
   let(:doc_type) { "SalesOrder" }
+  let(:commit_state) { false }
   let(:params) { {doc_type: doc_type} }
   let(:order) { create(:order_with_line_items) }
   let(:tax_rate) { create(:tax_rate, calculator: calculator, zone: ZoneSupport.global_zone) }
-  let(:invoice_instance) { SpreeAvatax::Invoice.new(order, doc_type, Logger.new("/dev/null")) }
+  let(:invoice_instance) { SpreeAvatax::Invoice.new(order, doc_type, commit_state, Logger.new("/dev/null")) }
 
   describe "#new" do
     before do
@@ -22,9 +23,15 @@ describe SpreeAvatax::Invoice do
       its(:CustomerCode) { should eq order.email }
       its(:DocDate)      { should eq Date.today.iso8601 }
       its(:DocType)      { should eq doc_type }
+      its(:Commit)       { should eq commit_state }
       its(:CompanyCode)  { should eq "foo" }
       its(:Discount)     { should eq order.promotion_adjustment_total }
       its(:DocCode)      { should eq order.number }
+
+      context "with commit=true" do
+        let(:commit_state) { true }
+        its(:Commit) { should be true }
+      end
     end
 
     it { invoice_instance.invoice.Addresses.size.should eq 1 }

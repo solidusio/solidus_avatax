@@ -32,7 +32,7 @@ describe Spree::Order do
 
       it "tells the avatax computer to compute tax" do # for storage in avalara and our own records
         expect(SpreeAvatax::TaxComputer).to receive(:new).with(
-          subject, hash_including(doc_type: 'SalesInvoice', status_field: :avatax_invoice_at)
+          subject, hash_including(doc_type: 'SalesInvoice', commit: true, status_field: :avatax_invoice_at)
         ).and_call_original
         SpreeAvatax::TaxComputer.any_instance.should_receive(:compute).once
         subject.next!
