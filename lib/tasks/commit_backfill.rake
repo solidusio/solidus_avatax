@@ -31,10 +31,10 @@ namespace :spree_avatax do
     # PREP TO ITERATE OVER ORDERS
 
     tax_svc = AvaTax::TaxService.new({
-      username:           SpreeAvatax::Config.username,
-      password:           SpreeAvatax::Config.password,
-      use_production_url: SpreeAvatax::Config.use_production_url,
-      clientname:         'Spree::Avatax',
+      username:               SpreeAvatax::Config.username,
+      password:               SpreeAvatax::Config.password,
+      use_production_account: SpreeAvatax::Config.use_production_account,
+      clientname:             'Spree::Avatax',
     })
 
     handle_result_errors = ->(result, order, request_method) do

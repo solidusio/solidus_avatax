@@ -10,10 +10,10 @@ module SpreeAvatax
 
       attr_accessor :company_code
 
-      # the "use_production_url" config will replace the "endpoint" config soon
-      attr_accessor :use_production_url
+      # the "use_production_account" config will replace the "endpoint" config soon
+      attr_accessor :use_production_account
     end
 
-    self.use_production_url = false
+    self.use_production_account = false
   end
 end
