@@ -24,8 +24,7 @@ You will also need to initialize a config object with your Avatax credentials as
 SpreeAvatax::Config.username = 'YOUR USERNAME'
 SpreeAvatax::Config.password = 'YOUR PASSWORD'
 SpreeAvatax::Config.company_code = 'YOUR COMPANY'
-SpreeAvatax::Config.endpoint = 'PROD OR DEV ENDPOINT'
-SpreeAvatax::Config.suppress_api_errors = true/false
+SpreeAvatax::Config.use_production_account = true or false
 ```
 
 It is left to for you to decide how this gets set, either as an environment initializer or via a Spree preference.

@@ -3,48 +3,39 @@ require 'spec_helper'
 describe Spree::Order do
   subject { create(:order_with_line_items) }
 
-  describe "#avataxable?" do
-    it "returns true if there are avataxable line items and a ship address" do
-      subject.stub(:line_items).and_return([1])
-      subject.stub(:ship_address).and_return(double(:as_null_object))
-      expect(subject).to be_avataxable
+  context "when transitioning from address" do
+    before do
+      subject.update_attributes!(state: 'address')
     end
 
-    it "returns false if there are no avataxable line items" do
-      subject.stub(:line_items).and_return([])
-      subject.stub(:ship_address).and_return(double(:as_null_object))
-      expect(subject).not_to be_avataxable
-    end
-
-    it "returns false if there is no ship address" do
-      subject.stub(:line_items).and_return([1])
-      subject.stub(:ship_address).and_return(nil)
-      expect(subject).not_to be_avataxable
+    it "generates a sales invoice" do
+      expect(SpreeAvatax::SalesOrder).to receive(:generate).with(subject)
+      subject.next!
     end
   end
 
-  describe "on state transition" do
-    context "when transitioning to complete" do
-      before do
-        subject.update_attribute(:state, "confirm")
-        subject.payments.create!(state: "checkout")
-      end
-
-      it "tells the avatax computer to compute tax" do # for storage in avalara and our own records
-        expect(SpreeAvatax::TaxComputer).to receive(:new).with(
-          subject, hash_including(doc_type: 'SalesInvoice', commit: true, status_field: :avatax_invoice_at)
-        ).and_call_original
-        SpreeAvatax::TaxComputer.any_instance.should_receive(:compute).once
-        subject.next!
-      end
+  context "when transitioning to confirm" do
+    before do
+      subject.update_attributes!(state: 'payment')
+      subject.payments.create!(state: 'checkout')
+      subject.stub(confirmation_required?: true)
     end
 
-    context "when not transitioning to complete" do
-      it "does not communicate with the avatax calculator" do
-        expect(SpreeAvatax::TaxComputer).not_to receive(:new)
-        SpreeAvatax::TaxComputer.any_instance.should_receive(:compute).never
-        subject.next!
-      end
+    it "generates the sales invoice" do
+      expect(SpreeAvatax::SalesInvoice).to receive(:generate).with(subject)
+      subject.next!
+    end
+  end
+
+  context "when transitioning to complete" do
+    before do
+      subject.update_attributes!(state: 'confirm')
+      subject.payments.create!(state: 'checkout')
+    end
+
+    it "commits the sales invoice" do
+      expect(SpreeAvatax::SalesInvoice).to receive(:commit).with(subject)
+      subject.next!
     end
   end
 

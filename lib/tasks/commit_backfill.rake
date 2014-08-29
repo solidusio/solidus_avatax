@@ -1,4 +1,3 @@
-require 'avatax_taxservice'
 require 'pp'
 
 namespace :spree_avatax do

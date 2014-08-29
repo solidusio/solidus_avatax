@@ -1,9 +1,12 @@
 require 'spec_helper'
 
 describe "Tax Calculation" do
+  let(:order) { create(:order_with_line_items, ship_address: address, line_items_count: 2) }
   let(:address) { create(:address, address1: "35 Crosby St", city: "New York", zipcode: 10013) }
-  let(:tax_rate) { create(:tax_rate, calculator: SpreeAvatax::Calculator.new, zone: ZoneSupport.global_zone) }
-  let(:order) { create(:order_with_line_items, ship_address: address) }
+  let(:line_item_1) { order.line_items.first }
+  let(:line_item_2) { order.line_items.last }
+
+  let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op' }
 
   before do
     setup_configs
@@ -11,32 +14,27 @@ describe "Tax Calculation" do
   end
 
   context "without discounts" do
-    it "computes taxes for a line item" do
-      Avalara.should_receive(:get_tax).with do |invoice|
-        expect(invoice.DocType).to eq 'SalesOrder'
-        expect(invoice.CustomerCode).to eq order.email
-        expect(invoice.CompanyCode).to eq "Bonobos"
-        expect(invoice.Discount).to eq BigDecimal("0.00")
-        expect(invoice.DocCode).to eq order.number
-        line = invoice.Lines.first
-        line_item = order.line_items.first
-        expect(line.LineNo).to eq line_item.id
-        expect(line.Qty).to eq 1
-        expect(line.Amount).to eq line_item.price
-        expect(line.ItemCode).to eq line_item.variant.sku
-        expect(line.Discounted).to eq false
-      end.and_call_original
+    subject do
+      VCR.use_cassette('sales_order_gettax_without_discounts') do
+        SpreeAvatax::SalesOrder.generate(order)
+      end
+    end
 
-      expect do
-        VCR.use_cassette('tax_call_without_discounts') do
-          SpreeAvatax::TaxComputer.new(order).compute
-        end
-      end.to change { order.line_items.first.additional_tax_total }
+    it "computes taxes for a line item" do
+      expect {
+        subject
+      }.to change { order.line_items.first.additional_tax_total }
     end
   end
 
   context "with discounts" do
-    let(:order_promotion) do
+    subject do
+      VCR.use_cassette('sales_order_gettax_with_discounts') do
+        SpreeAvatax::SalesOrder.generate(order)
+      end
+    end
+
+    let(:promotion) do
       promo = create(:promotion, code: "order_promotion")
       calculator = Spree::Calculator::FlatRate.new
       calculator.preferred_amount = 10
@@ -51,31 +49,14 @@ describe "Tax Calculation" do
     end
 
     before do
-      order.line_items.each { |li| li.update_attribute(:price, 50.0) }
+      order.line_items.each { |li| li.update_attributes!(price: 50.0) }
       PromotionSupport.set_order_promotion(order)
       PromotionSupport.set_line_item_promotion(order)
     end
 
     it "computes taxes for a line item" do
-      Avalara.should_receive(:get_tax).with do |invoice|
-        expect(invoice.DocType).to eq 'SalesOrder'
-        expect(invoice.CustomerCode).to eq order.email
-        expect(invoice.CompanyCode).to eq "Bonobos"
-        expect(invoice.Discount).to eq 10
-        expect(invoice.DocCode).to eq order.number
-        line = invoice.Lines.first
-        line_item = order.line_items.first
-        expect(line.LineNo).to eq line_item.id
-        expect(line.Qty).to eq 1
-        expect(line.Amount).to eq 40.0
-        expect(line.ItemCode).to eq line_item.variant.sku
-        expect(line.Discounted).to eq true
-      end.and_call_original
-
       expect do
-        VCR.use_cassette('tax_call_with_discounts') do
-          SpreeAvatax::TaxComputer.new(order).compute
-        end
+        subject
       end.to change { order.line_items.first.reload.additional_tax_total }
     end
   end
@@ -86,7 +67,7 @@ def setup_configs
   @avalara_config = YAML.load_file("spec/avalara_config.yml")
   SpreeAvatax::Config.password = @avalara_config['password']
   SpreeAvatax::Config.username = @avalara_config['username']
-  SpreeAvatax::Config.endpoint = 'https://development.avalara.net/'
+  SpreeAvatax::Config.use_production_account = false
   SpreeAvatax::Config.company_code = 'Bonobos'
 rescue => e
   pending("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")

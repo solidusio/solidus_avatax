@@ -8,7 +8,7 @@ module PromotionSupport
 
     def set_line_item_promotion(order)
       order.coupon_code = line_item_promotion(order).code
-      Spree::PromotionHandler::Coupon.new(order).apply
+      Spree::PromotionHandler::Coupon.new(order).apply_without_avatax
       order.reload
     end
 
@@ -22,7 +22,7 @@ module PromotionSupport
 
     def set_order_promotion(order)
       order.coupon_code = order_promotion(order).code
-      Spree::PromotionHandler::Coupon.new(order).apply
+      Spree::PromotionHandler::Coupon.new(order).apply_without_avatax
       order.reload
     end
   end

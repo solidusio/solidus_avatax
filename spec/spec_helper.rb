@@ -1,6 +1,6 @@
 # Additional requirements
+require 'avatax_taxservice'
 require 'hashie'
-require 'avalara'
 require 'honeybadger'
 require 'pagerduty'
 
@@ -60,7 +60,9 @@ RSpec.configure do |config|
   config.include Spree::TestingSupport::UrlHelpers
 
   config.include ActionView::Helpers::TagHelper
-  config.include ActionView::Context 
+  config.include ActionView::Context
+  config.include SalesOrderSoapResponses
+  config.include SalesInvoiceSoapResponses
 
   # == Mock Framework
   #
