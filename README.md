@@ -8,26 +8,7 @@ This is an update to the original Spree Avatax gem (https://github.com/markalinn
 App Configuration
 -----------------
 
-Unlike the old gem which used a Rails installation generator, the new Avatax calculator can be integrated via the prescribed Spree 2.2.x method of adding to the calculators array in your configuration file, http://guides.spreecommerce.com/developer/calculators.html.
-
-```
-### inside config/initializers/spree.rb:
-config = Rails.application.config
-config.spree.calculators.tax_rates << SpreeAvatax::Calculator
-config.spree.calculators.shipping_methods << SpreeAvatax::Calculator
-config.spree.calculators.promotion_actions_create_adjustments << SpreeAvatax::Calculator
-```
-
-You will also need to initialize a config object with your Avatax credentials as such:
-
-```
-SpreeAvatax::Config.username = 'YOUR USERNAME'
-SpreeAvatax::Config.password = 'YOUR PASSWORD'
-SpreeAvatax::Config.company_code = 'YOUR COMPANY'
-SpreeAvatax::Config.use_production_account = true or false
-```
-
-It is left to for you to decide how this gets set, either as an environment initializer or via a Spree preference.
+Running `spree_avatax:install` (see "Installation") will generate [an initializer](https://github.com/bonobos/spree_avatax/blob/2-2-stable/lib/generators/spree_avatax/install/templates/config/initializers/avatax.rb) for your Rails app which you need to modify with your Avatax credentials.
 
 Known Issues
 ------------
