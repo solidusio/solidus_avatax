@@ -70,5 +70,5 @@ def setup_configs
   SpreeAvatax::Config.use_production_account = false
   SpreeAvatax::Config.company_code = 'Bonobos'
 rescue => e
-  pending("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
+  skip("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
 end
