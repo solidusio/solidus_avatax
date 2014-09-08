@@ -10,7 +10,7 @@ describe SpreeAvatax::SalesInvoice do
     let(:order) { create(:shipped_order, line_items_count: 1) }
     let(:line_item) { order.line_items.first }
 
-    let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op' }
+    let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op', calculator: create(:avatax_tax_calculator) }
 
     let(:expected_gettax_params) do
       {

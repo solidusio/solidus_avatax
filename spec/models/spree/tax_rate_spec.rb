@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Spree::TaxRate do
-  let!(:tax_rate) { create(:tax_rate) }
+  let!(:tax_rate) { create(:tax_rate, calculator: create(:avatax_tax_calculator)) }
 
   describe '.match' do
     it { expect(Spree::TaxRate.match(:whatever)).to eq [tax_rate] }

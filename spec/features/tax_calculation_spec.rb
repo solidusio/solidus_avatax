@@ -6,7 +6,7 @@ describe "Tax Calculation" do
   let(:line_item_1) { order.line_items.first }
   let(:line_item_2) { order.line_items.last }
 
-  let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op' }
+  let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op', calculator: create(:avatax_tax_calculator) }
 
   before do
     setup_configs

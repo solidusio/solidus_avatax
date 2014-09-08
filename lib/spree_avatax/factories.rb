@@ -1,6 +1,9 @@
 FactoryGirl.define do
   sequence(:doc_id) { |n| n.to_s.rjust(16, '0') }
 
+  factory :avatax_tax_calculator, class: SpreeAvatax::Calculator do
+  end
+
   factory :avatax_sales_order, class: SpreeAvatax::SalesOrder do
     association :order, factory: :order_with_line_items, line_items_count: 1
     doc_code { order.number }
