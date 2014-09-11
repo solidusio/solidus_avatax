@@ -74,6 +74,13 @@ describe SpreeAvatax::SalesOrder do
         subject
       }.to change { SpreeAvatax::SalesOrder.count }.by(1)
       expect(order.avatax_sales_orders).to eq [SpreeAvatax::SalesOrder.last]
+      expect(order.avatax_sales_orders.last.attributes).to include({
+        "transaction_id"        => gettax_response[:transaction_id],
+        "doc_code"              => gettax_response[:doc_code],
+        "doc_date"              => gettax_response[:doc_date],
+        "pre_tax_total"         => BigDecimal.new(gettax_response[:total_amount]),
+        "additional_tax_total"  => BigDecimal.new(gettax_response[:total_tax]),
+      })
     end
 
     it 'persists the results to the order' do

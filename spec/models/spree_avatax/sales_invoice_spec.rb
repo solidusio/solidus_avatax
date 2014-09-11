@@ -74,6 +74,14 @@ describe SpreeAvatax::SalesInvoice do
         subject
       }.to change { SpreeAvatax::SalesInvoice.count }.by(1)
       expect(order.avatax_sales_invoice).to eq SpreeAvatax::SalesInvoice.last
+      expect(order.avatax_sales_invoice.attributes).to include({
+        "transaction_id"        => gettax_response[:transaction_id],
+        "doc_id"                => gettax_response[:doc_id],
+        "doc_code"              => gettax_response[:doc_code],
+        "doc_date"              => gettax_response[:doc_date],
+        "pre_tax_total"         => BigDecimal.new(gettax_response[:total_amount]),
+        "additional_tax_total"  => BigDecimal.new(gettax_response[:total_tax]),
+      })
     end
 
     it 'persists the results to the order' do
@@ -289,6 +297,42 @@ describe SpreeAvatax::SalesInvoice do
             subject
           }.to raise_error(new_error)
         end
+      end
+    end
+  end
+
+  describe '.cancel' do
+    subject do
+      SpreeAvatax::SalesInvoice.cancel(order)
+    end
+
+    context 'when the sales invoice exists' do
+      let(:order) { sales_invoice.order }
+      let(:sales_invoice) { create(:avatax_sales_invoice, committed_at: Time.now) }
+
+      let(:expected_canceltax_params) do
+        {
+          doccode:     sales_invoice.doc_code,
+          doctype:     SpreeAvatax::SalesInvoice::DOC_TYPE,
+          cancelcode:  SpreeAvatax::SalesInvoice::CANCEL_CODE,
+          companycode: SpreeAvatax::Config.company_code,
+        }
+      end
+
+      let(:canceltax_response) { sales_invoice_canceltax_response }
+
+      let!(:canceltax_stub) do
+        SpreeAvatax::Shared.tax_svc
+          .should_receive(:canceltax)
+          .with(expected_canceltax_params)
+          .and_return(canceltax_response)
+      end
+
+      it 'should update the sales invoice' do
+        expect {
+          subject
+        }.to change { sales_invoice.canceled_at }.from(nil)
+        expect(sales_invoice.cancel_transaction_id).to eq canceltax_response[:transaction_id]
       end
     end
   end

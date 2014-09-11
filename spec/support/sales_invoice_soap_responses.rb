@@ -155,4 +155,22 @@ module SalesInvoiceSoapResponses
       ],
     }
   end
+
+  def sales_invoice_canceltax_response
+    {
+      transaction_id: "4321919394664864",
+      result_code: "Success",
+      doc_id: "57305344",
+      messages: [
+        {
+          summary:  nil,
+          details:  nil,
+          helplink: nil,
+          refersto: nil,
+          severity: nil,
+          source:   nil,
+        },
+      ],
+    }
+  end
 end

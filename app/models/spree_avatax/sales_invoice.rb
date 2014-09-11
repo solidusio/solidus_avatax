@@ -1,11 +1,12 @@
 # A SalesInvoice is persisted by Avatax but it's not recognized as complete until it's "committed".
 class SpreeAvatax::SalesInvoice < ActiveRecord::Base
   DOC_TYPE = 'SalesInvoice'
+  CANCEL_CODE = 'DocVoided'
 
   class CommitInvoiceNotFound < StandardError; end
   class AlreadyCommittedError < StandardError; end
 
-  belongs_to :order, class_name: "Spree::Order"
+  belongs_to :order, class_name: "Spree::Order", inverse_of: :avatax_sales_invoice
 
   validates :order, presence: true
   validates :doc_id, presence: true
@@ -35,6 +36,7 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
       end
 
       sales_invoice = order.create_avatax_sales_invoice!({
+        transaction_id:        result[:transaction_id],
         doc_id:                result[:doc_id],
         doc_code:              result[:doc_code],
         doc_date:              result[:doc_date],
@@ -63,6 +65,19 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
       SpreeAvatax::Config.error_handler ? SpreeAvatax::Config.error_handler.call(e) : raise
     end
 
+    def cancel(order)
+      return if order.avatax_sales_invoice.nil?
+
+      result = cancel_tax(order.avatax_sales_invoice)
+
+      order.avatax_sales_invoice.update!({
+        canceled_at:           Time.now,
+        cancel_transaction_id: result[:transaction_id],
+      })
+    rescue Exception => e
+      SpreeAvatax::Config.error_handler ? SpreeAvatax::Config.error_handler.call(e) : raise
+    end
+
     private
 
     def post_tax(sales_invoice)
@@ -72,6 +87,19 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
       logger.debug { "[avatax] params: #{params.to_json}" }
 
       response = SpreeAvatax::Shared.tax_svc.posttax(params)
+      SpreeAvatax::Shared.require_success!(response)
+
+      response
+    end
+
+    def cancel_tax(sales_invoice)
+      params = canceltax_params(sales_invoice)
+
+      logger.info "[avatax] canceltax sales_invoice=#{sales_invoice.id}"
+      logger.debug { "[avatax] params: #{params.to_json}" }
+
+      response = SpreeAvatax::Shared.tax_svc.canceltax(params)
+
       SpreeAvatax::Shared.require_success!(response)
 
       response
@@ -93,5 +121,15 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
       }
     end
 
+    # see https://github.com/avadev/AvaTax-Calc-SOAP-Ruby/blob/master/CancelTaxTest.rb
+    def canceltax_params(sales_invoice)
+      {
+        # Required Parameters
+        doccode:     sales_invoice.doc_code,
+        doctype:     DOC_TYPE,
+        cancelcode:  CANCEL_CODE,
+        companycode: SpreeAvatax::Config.company_code,
+      }
+    end
   end
 end

@@ -5,7 +5,7 @@
 class SpreeAvatax::SalesOrder < ActiveRecord::Base
   DOC_TYPE = 'SalesOrder'
 
-  belongs_to :order, class_name: "Spree::Order"
+  belongs_to :order, class_name: "Spree::Order", inverse_of: :avatax_sales_orders
 
   validates :order, presence: true
   validates :doc_code, presence: true
@@ -24,6 +24,7 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
       line_item_tax_lines = SpreeAvatax::SalesShared.match_line_items_to_tax_lines(order, result)
 
       sales_order = order.avatax_sales_orders.create!({
+        transaction_id:        result[:transaction_id],
         doc_code:              result[:doc_code],
         doc_date:              result[:doc_date],
         pre_tax_total:         result[:total_amount],
