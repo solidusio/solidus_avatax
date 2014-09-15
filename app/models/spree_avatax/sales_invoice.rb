@@ -54,7 +54,7 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     def commit(order)
       return if !SpreeAvatax::Shared.taxable_order?(order)
 
-      raise CommitInvoiceNotFound if order.avatax_sales_invoice.nil?
+      raise CommitInvoiceNotFound.new("No invoice for order #{order.number}") if order.avatax_sales_invoice.nil?
 
       post_tax(order.avatax_sales_invoice)
 
