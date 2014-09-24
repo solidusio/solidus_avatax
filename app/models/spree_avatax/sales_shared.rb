@@ -76,7 +76,7 @@ module SpreeAvatax::SalesShared
     def gettax_params(order, doc_type)
       {
         doccode:       order.number,
-        customercode:  order.email,
+        customercode:  REXML::Text.normalize(order.email),
         companycode:   SpreeAvatax::Config.company_code,
 
         doctype: doc_type,
@@ -89,10 +89,10 @@ module SpreeAvatax::SalesShared
         addresses: [
           {
             addresscode: ADDRESS_CODE,
-            line1:       order.ship_address.address1,
-            line2:       order.ship_address.address2,
-            city:        order.ship_address.city,
-            postalcode:  order.ship_address.zipcode,
+            line1:       REXML::Text.normalize(order.ship_address.address1),
+            line2:       REXML::Text.normalize(order.ship_address.address2),
+            city:        REXML::Text.normalize(order.ship_address.city),
+            postalcode:  REXML::Text.normalize(order.ship_address.zipcode),
           },
         ],
 
@@ -114,7 +114,7 @@ module SpreeAvatax::SalesShared
           destinationcodeline: DESTINATION_CODE,
 
           # Best Practice Parameters
-          description: line_item.variant.product.description.to_s[0...100],
+          description: REXML::Text.normalize(line_item.variant.product.description.to_s.truncate(100)),
 
           # Optional Parameters (required for our context)
           discounted: order.promotion_adjustment_total > 0.0, # Continue to pass this field if we have an order-level discount so the line item gets discount calculated onto it

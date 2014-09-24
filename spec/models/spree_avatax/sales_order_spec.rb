@@ -28,10 +28,10 @@ describe SpreeAvatax::SalesOrder do
         addresses: [
           {
             addresscode: SpreeAvatax::SalesShared::ADDRESS_CODE,
-            line1:       order.ship_address.address1,
-            line2:       order.ship_address.address2,
-            city:        order.ship_address.city,
-            postalcode:  order.ship_address.zipcode,
+            line1:       REXML::Text.normalize(order.ship_address.address1),
+            line2:       REXML::Text.normalize(order.ship_address.address2),
+            city:        REXML::Text.normalize(order.ship_address.city),
+            postalcode:  REXML::Text.normalize(order.ship_address.zipcode),
           },
         ],
 
@@ -52,7 +52,7 @@ describe SpreeAvatax::SalesOrder do
       }
     end
 
-    let(:expected_truncated_description) { line_item.variant.product.description[0...100] }
+    let(:expected_truncated_description) { line_item.variant.product.description.truncate(100) }
     let(:gettax_response) { sales_order_gettax_response(order.number, line_item.id) }
     let(:gettax_response_line_item_tax_line) { Array.wrap(gettax_response[:tax_lines][:tax_line]).first }
     let(:order_calculated_tax) do
@@ -102,6 +102,34 @@ describe SpreeAvatax::SalesOrder do
       expect(adjustment.amount).to eq line_item_calculated_tax
       expect(adjustment.source).to eq tax_rate
       expect(adjustment.state).to eq 'closed'
+    end
+
+    context 'user input contains XML characters' do
+      let(:line1) { "<&line1>" }
+      let(:line2) { "<&line2>" }
+      let(:city) { "<&city>" }
+      let(:zipcode) { "<12345>" }
+      let(:email) { "test&@test.com" }
+      let(:description) { "A description <wi>&/th xml characters" }
+
+      before(:each) do
+        ship_address = order.ship_address
+        ship_address.update_columns(address1: line1, address2: line2, city: city, zipcode: zipcode)
+        order.update_columns(email: email)
+        line_item.variant.product.update_columns(description: description)
+      end
+
+      let(:expected_gettax_params) do
+        super().tap do |params|
+          params[:addresses].first.merge!(line1: REXML::Text.normalize(line1), line2: REXML::Text.normalize(line2), city: REXML::Text.normalize(city), postalcode: REXML::Text.normalize(zipcode))
+          params[:customercode] = REXML::Text.normalize(email)
+          params[:lines][0][:description] = REXML::Text.normalize(description)
+        end
+      end
+
+      it 'succeeds' do
+        subject
+      end
     end
 
     context 'when an error occurs' do
@@ -162,7 +190,7 @@ describe SpreeAvatax::SalesOrder do
 
     describe 'when the description is too long' do
       let(:description) { 'a'*1000 }
-      let(:expected_truncated_description) { 'a'*100 }
+      let(:expected_truncated_description) { description.truncate(100) }
 
       before do
         line_item.variant.product.update!(description: description)
