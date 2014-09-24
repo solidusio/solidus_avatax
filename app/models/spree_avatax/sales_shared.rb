@@ -107,7 +107,7 @@ module SpreeAvatax::SalesShared
         {
           # Required Parameters
           no:                  line_item.id,
-          item_code:           line_item.variant.sku,
+          itemcode:            line_item.variant.sku,
           qty:                 line_item.quantity,
           amount:              line_item.discounted_amount.round(2).to_f,
           origincodeline:      ORIGIN_CODE,
