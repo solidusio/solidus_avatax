@@ -1,7 +1,47 @@
 require 'spec_helper'
 
 describe Spree::Order do
-  subject { create(:order_with_line_items) }
+  subject { order }
+
+  let!(:order) { create(:order_with_line_items, line_items_count: 1) }
+
+  context 'after_save' do
+    context 'when something unimportant changes' do
+      def change_unimportant_attribute
+        order.update_attributes!(special_instructions: 'unimportant change')
+      end
+
+      it 'does not update avatax' do
+        expect(SpreeAvatax::SalesOrder).to receive(:generate).never
+        expect(SpreeAvatax::SalesInvoice).to receive(:generate).never
+        change_unimportant_attribute
+      end
+    end
+
+    context 'when the ship address changes' do
+      def change_address
+        order.update_attributes!(ship_address: create(:address))
+      end
+
+      context 'when in confirm state' do
+        before { order.update_columns(state: 'confirm') }
+
+        it 'generates the sales invoice' do
+          expect(SpreeAvatax::SalesOrder).to receive(:generate).never
+          expect(SpreeAvatax::SalesInvoice).to receive(:generate).with(order).once
+          change_address
+        end
+      end
+
+      context 'when not in confirm state' do
+        it 'does not update avatax' do
+          expect(SpreeAvatax::SalesOrder).to receive(:generate).never
+          expect(SpreeAvatax::SalesInvoice).to receive(:generate).never
+          change_address
+        end
+      end
+    end
+  end
 
   context "when transitioning from address" do
     before do
