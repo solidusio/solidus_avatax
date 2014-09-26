@@ -202,7 +202,7 @@ describe SpreeAvatax::SalesOrder do
     end
 
     context 'when the order is not taxable' do
-      let(:order) { create(:order_with_line_items, ship_address: nil, line_items_count: 1) }
+      let(:order) { create(:order_with_line_items, ship_address: nil) }
 
       let!(:gettax_stub) { }
 

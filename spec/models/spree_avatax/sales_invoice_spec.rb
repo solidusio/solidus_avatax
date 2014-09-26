@@ -214,7 +214,7 @@ describe SpreeAvatax::SalesInvoice do
     end
 
     context 'when the order is not taxable' do
-      let(:order) { create(:order_with_line_items, ship_address: nil, line_items_count: 1) }
+      let(:order) { create(:order_with_line_items, ship_address: nil) }
 
       let!(:gettax_stub) { }
 
@@ -237,7 +237,7 @@ describe SpreeAvatax::SalesInvoice do
       SpreeAvatax::SalesInvoice.commit(order)
     end
 
-    let!(:order) { sales_invoice.order }
+    let(:order) { sales_invoice.order }
     let(:sales_invoice) { create(:avatax_sales_invoice) }
 
     let(:expected_posttax_params) do
