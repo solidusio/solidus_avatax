@@ -94,6 +94,7 @@ RSpec.configure do |config|
   config.before :each do |example|
     DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
     DatabaseCleaner.start
+    create(:tax_rate, calculator: create(:avatax_tax_calculator))
   end
 
   # After each spec clean the database.

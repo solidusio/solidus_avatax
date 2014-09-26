@@ -7,14 +7,13 @@ describe Spree::ShippingRate do
 
   let(:shipping_rate) do
     shipment.shipping_rates.create!({
-      tax_rate:        tax_rate,
+      tax_rate:        Spree::TaxRate.first,
       shipping_method: shipping_method,
       cost:            10.00,
       selected:        true,
     })
   end
 
-  let(:tax_rate) { create(:tax_rate, calculator: create(:avatax_tax_calculator)) }
   let(:shipment) { create(:shipment) }
   let(:shipping_method) { create(:shipping_method) }
 

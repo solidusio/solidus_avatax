@@ -10,8 +10,6 @@ describe SpreeAvatax::SalesOrder do
     let(:order) { create(:order_with_line_items, line_items_count: 1) }
     let(:line_item) { order.line_items.first }
 
-    let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op', calculator: create(:avatax_tax_calculator) }
-
     let(:expected_gettax_params) do
       {
         doccode:       order.number,
@@ -100,7 +98,7 @@ describe SpreeAvatax::SalesOrder do
       expect(line_item.adjustments.tax.count).to eq 1
       adjustment = line_item.adjustments.first
       expect(adjustment.amount).to eq line_item_calculated_tax
-      expect(adjustment.source).to eq tax_rate
+      expect(adjustment.source).to eq Spree::TaxRate.first
       expect(adjustment.state).to eq 'closed'
     end
 
