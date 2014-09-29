@@ -143,7 +143,7 @@ describe SpreeAvatax::SalesOrder do
       end
 
       context 'when an error_handler is not defined' do
-        it 'calls the handler instead of raising the original error' do
+        it 'raises the original error' do
           expect {
             subject
           }.to raise_error(error)
@@ -151,11 +151,11 @@ describe SpreeAvatax::SalesOrder do
       end
 
       context 'when an error_handler is defined' do
-        let(:handler) { -> (e) { raise new_error } }
+        let(:handler) { -> (o, e) { raise new_error } }
         let(:new_error) { StandardError.new('just testing 2') }
 
         before do
-          SpreeAvatax::Config.stub(error_handler: handler)
+          SpreeAvatax::Config.stub(sales_order_generate_error_handler: handler)
         end
 
         it 'calls the handler instead of raising the original error' do

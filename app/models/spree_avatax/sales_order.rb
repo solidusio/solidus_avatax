@@ -35,7 +35,11 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
 
       sales_order
     rescue Exception => e
-      SpreeAvatax::Config.error_handler ? SpreeAvatax::Config.error_handler.call(e) : raise
+      if SpreeAvatax::Config.sales_order_generate_error_handler
+        SpreeAvatax::Config.sales_order_generate_error_handler.call(order, e)
+      else
+        raise
+      end
     end
   end
 end

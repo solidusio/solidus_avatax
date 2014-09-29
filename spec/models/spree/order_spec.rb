@@ -7,14 +7,14 @@ describe Spree::Order do
 
   context 'after_save' do
     context 'when something unimportant changes' do
-      def change_unimportant_attribute
-        order.update_attributes!(special_instructions: 'unimportant change')
-      end
+      context 'when in confirm state' do
+        before { order.update_columns(state: 'confirm') }
 
-      it 'does not update avatax' do
-        expect(SpreeAvatax::SalesOrder).to receive(:generate).never
-        expect(SpreeAvatax::SalesInvoice).to receive(:generate).never
-        change_unimportant_attribute
+        it 'does not change the order state' do
+          expect {
+            order.update_attributes!(special_instructions: 'unimportant change')
+          }.to_not change { order.state }
+        end
       end
     end
 
@@ -26,20 +26,20 @@ describe Spree::Order do
       context 'when in confirm state' do
         before { order.update_columns(state: 'confirm') }
 
-        it 'generates the sales invoice' do
-          expect(SpreeAvatax::SalesOrder).to receive(:generate).never
-          # NOTE: We can't actually test this because we had to use "after_commit" which never
-          #       happens in test mode.  See note in order_decorator.rb.
-          # expect(SpreeAvatax::SalesInvoice).to receive(:generate).with(order).once
-          change_address
+        it 'sets the order state to payment' do
+          expect {
+            change_address
+          }.to change { order.state }.from('confirm').to('payment')
         end
       end
 
       context 'when not in confirm state' do
+        before { order.update_columns(state: 'address') }
+
         it 'does not update avatax' do
-          expect(SpreeAvatax::SalesOrder).to receive(:generate).never
-          expect(SpreeAvatax::SalesInvoice).to receive(:generate).never
-          change_address
+          expect {
+            change_address
+          }.to_not change { order.state }
         end
       end
     end

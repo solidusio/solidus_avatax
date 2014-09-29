@@ -4,7 +4,6 @@ Spree::Order.class_eval do
   has_many :avatax_sales_orders,  class_name: 'SpreeAvatax::SalesOrder', inverse_of: :order
 
   after_save :avatax_order_after_save
-  after_commit :avatax_order_after_commit
 
   state_machine.after_transition from: :address do |order, transition|
     SpreeAvatax::SalesOrder.generate(order)
@@ -29,19 +28,12 @@ Spree::Order.class_eval do
   def avatax_order_after_save
     # NOTE: DO NOT do anything that will trigger any saves inside of here.  It will cause infinite
     #       recursion since it will cause another "after_save" to be called with the dirty attributes
-    #       in the same state. Instead just flag taxes as needing to be recalculated and then do it
-    #       in the avatax_order_after_commit method.  This will again trigger an after_save but this
-    #       time the "_changed?" attributes will be reset.
+    #       in the same state. Instead just move the order out of the "confirm" state so that it
+    #       will have to go through tax calculations again.
     if ship_address_id_changed? && confirm?
-      @recalculate_taxes = true
+      Rails.logger.info "[avatax] order address change detected for order #{number} while in confirm state. resetting order state to 'payment'."
+      update_columns(state: 'payment', updated_at: Time.now)
     end
   end
 
-  def avatax_order_after_commit
-    # See above note in avatax_order_after_save
-    if @recalculate_taxes
-      @recalculate_taxes = nil
-      SpreeAvatax::SalesInvoice.generate(self)
-    end
-  end
 end

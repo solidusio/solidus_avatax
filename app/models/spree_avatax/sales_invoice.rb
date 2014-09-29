@@ -48,7 +48,11 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
 
       sales_invoice
     rescue Exception => e
-      SpreeAvatax::Config.error_handler ? SpreeAvatax::Config.error_handler.call(e) : raise
+      if SpreeAvatax::Config.sales_invoice_generate_error_handler
+        SpreeAvatax::Config.sales_invoice_generate_error_handler.call(order, e)
+      else
+        raise
+      end
     end
 
     def commit(order)
@@ -62,7 +66,11 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
 
       order.avatax_sales_invoice
     rescue Exception => e
-      SpreeAvatax::Config.error_handler ? SpreeAvatax::Config.error_handler.call(e) : raise
+      if SpreeAvatax::Config.sales_invoice_commit_error_handler
+        SpreeAvatax::Config.sales_invoice_commit_error_handler.call(order, e)
+      else
+        raise
+      end
     end
 
     def cancel(order)
@@ -75,7 +83,11 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
         cancel_transaction_id: result[:transaction_id],
       })
     rescue Exception => e
-      SpreeAvatax::Config.error_handler ? SpreeAvatax::Config.error_handler.call(e) : raise
+      if SpreeAvatax::Config.sales_invoice_cancel_error_handler
+        SpreeAvatax::Config.sales_invoice_cancel_error_handler.call(order, e)
+      else
+        raise
+      end
     end
 
     private

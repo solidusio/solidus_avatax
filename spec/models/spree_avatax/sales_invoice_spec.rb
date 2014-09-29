@@ -152,11 +152,11 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       context 'when an error_handler is defined' do
-        let(:handler) { -> (e) { raise new_error } }
+        let(:handler) { -> (o, e) { raise new_error } }
         let(:new_error) { StandardError.new('just testing 2') }
 
         before do
-          SpreeAvatax::Config.stub(error_handler: handler)
+          SpreeAvatax::Config.stub(sales_invoice_generate_error_handler: handler)
         end
 
         it 'calls the handler instead of raising the original error' do
@@ -305,7 +305,7 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       context 'when an error_handler is not defined' do
-        it 'calls the handler instead of raising the original error' do
+        it 'raises the original error' do
           expect {
             subject
           }.to raise_error(error)
@@ -313,11 +313,11 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       context 'when an error_handler is defined' do
-        let(:handler) { -> (e) { raise new_error } }
+        let(:handler) { -> (o, e) { raise new_error } }
         let(:new_error) { StandardError.new('just testing 2') }
 
         before do
-          SpreeAvatax::Config.stub(error_handler: handler)
+          SpreeAvatax::Config.stub(sales_invoice_commit_error_handler: handler)
         end
 
         it 'calls the handler instead of raising the original error' do
@@ -362,7 +362,40 @@ describe SpreeAvatax::SalesInvoice do
         }.to change { sales_invoice.canceled_at }.from(nil)
         expect(sales_invoice.cancel_transaction_id).to eq canceltax_response[:transaction_id]
       end
+
+      context 'when an error occurs' do
+        let(:error) { StandardError.new('just testing') }
+        let!(:canceltax_stub) { }
+
+        before do
+          SpreeAvatax::SalesInvoice
+            .should_receive(:cancel_tax)
+            .and_raise(error)
+        end
+
+        context 'when an error_handler is not defined' do
+          it 'raises the original error' do
+            expect {
+              subject
+            }.to raise_error(error)
+          end
+        end
+
+        context 'when an error_handler is defined' do
+          let(:handler) { -> (o, e) { raise new_error } }
+          let(:new_error) { StandardError.new('just testing 2') }
+
+          before do
+            SpreeAvatax::Config.stub(sales_invoice_cancel_error_handler: handler)
+          end
+
+          it 'calls the handler instead of raising the original error' do
+            expect {
+              subject
+            }.to raise_error(new_error)
+          end
+        end
+      end
     end
   end
-
 end
