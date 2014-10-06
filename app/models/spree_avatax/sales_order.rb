@@ -21,7 +21,7 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
 
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
       # run this immediately to ensure that everything matches up before modifying the database
-      line_item_tax_lines = SpreeAvatax::SalesShared.match_line_items_to_tax_lines(order, result)
+      tax_line_data = SpreeAvatax::SalesShared.build_tax_line_data(order, result)
 
       sales_order = order.avatax_sales_orders.create!({
         transaction_id:        result[:transaction_id],
@@ -31,7 +31,7 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
         additional_tax_total:  result[:total_tax],
       })
 
-      SpreeAvatax::SalesShared.update_taxes(order, line_item_tax_lines)
+      SpreeAvatax::SalesShared.update_taxes(order, tax_line_data)
 
       sales_order
     rescue Exception => e
