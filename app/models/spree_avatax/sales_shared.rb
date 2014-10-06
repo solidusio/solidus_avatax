@@ -84,7 +84,8 @@ module SpreeAvatax::SalesShared
 
         commit: false, # we commit separately after the order completes
 
-        discount: order.promotion_adjustment_total.round(2).to_f,
+        # NOTE: we only want order-level adjustments here. not line item or shipping adjustments.
+        discount: order.avatax_promotion_adjustment_total.round(2).to_f,
 
         addresses: [
           {
@@ -117,7 +118,7 @@ module SpreeAvatax::SalesShared
           description: REXML::Text.normalize(line_item.variant.product.description.to_s.truncate(100)),
 
           # Optional Parameters (required for our context)
-          discounted: order.promotion_adjustment_total > 0.0, # Continue to pass this field if we have an order-level discount so the line item gets discount calculated onto it
+          discounted: order.avatax_promotion_adjustment_total > 0.0, # Continue to pass this field if we have an order-level discount so the line item gets discount calculated onto it
         }
       end
     end

@@ -21,7 +21,7 @@ describe SpreeAvatax::SalesOrder do
 
         commit: false,
 
-        discount: order.promotion_adjustment_total.round(2).to_f,
+        discount: order.avatax_promotion_adjustment_total.round(2).to_f,
 
         addresses: [
           {
@@ -44,7 +44,7 @@ describe SpreeAvatax::SalesOrder do
 
             description: expected_truncated_description,
 
-            discounted: order.promotion_adjustment_total > 0.0,
+            discounted: order.avatax_promotion_adjustment_total > 0.0,
           },
         ]
       }

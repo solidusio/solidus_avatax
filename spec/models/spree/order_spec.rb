@@ -81,10 +81,10 @@ describe Spree::Order do
     end
   end
 
-  describe '#promotion_adjustment_total' do
+  describe '#avatax_promotion_adjustment_total' do
     context 'no adjustments exist' do
       it 'returns 0' do
-        expect(subject.promotion_adjustment_total).to eq 0
+        expect(subject.avatax_promotion_adjustment_total).to eq 0
       end
     end
 
@@ -95,7 +95,7 @@ describe Spree::Order do
       end
 
       it 'returns 10.99' do
-        expect(subject.promotion_adjustment_total).to eq BigDecimal("10.99")
+        expect(subject.avatax_promotion_adjustment_total).to eq BigDecimal("10.99")
       end
     end
   end

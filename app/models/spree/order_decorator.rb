@@ -21,7 +21,7 @@ Spree::Order.class_eval do
     SpreeAvatax::SalesInvoice.cancel(order)
   end
 
-  def promotion_adjustment_total
+  def avatax_promotion_adjustment_total
     adjustments.promotion.eligible.sum(:amount).abs
   end
 
