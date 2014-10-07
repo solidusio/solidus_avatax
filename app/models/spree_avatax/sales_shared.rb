@@ -3,6 +3,10 @@ module SpreeAvatax::SalesShared
   DESTINATION_CODE = "1"
   ORIGIN_CODE = "1"
 
+  SHIPPING_TAX_CODE = 'FR020100' # docs: http://goo.gl/KuIuxc
+
+  SHIPPING_DESCRIPTION = 'Shipping Charge'
+
   class InvalidApiResponse < StandardError; end
 
   class << self
@@ -21,16 +25,18 @@ module SpreeAvatax::SalesShared
       response
     end
 
-    def update_taxes(order, line_item_tax_lines)
+    def update_taxes(order, tax_line_data)
       reset_tax_attributes(order)
 
-      line_item_tax_lines.each do |line_item, tax_line|
-        line_item.update_column(:pre_tax_amount, line_item.discounted_amount)
+      tax_line_data.each do |data|
+        record, tax_line = data[:record], data[:tax_line]
+
+        record.update_column(:pre_tax_amount, record.discounted_amount)
 
         tax = BigDecimal.new(tax_line[:tax]).abs
 
-        line_item.adjustments.tax.create!({
-          adjustable: line_item,
+        record.adjustments.tax.create!({
+          adjustable: record,
           amount:     tax,
           order:      order,
           label:      Spree.t(:avatax_label),
@@ -39,31 +45,50 @@ module SpreeAvatax::SalesShared
           state:      'closed', # this tells spree not to automatically recalculate avatax tax adjustments
         })
 
-        Spree::ItemAdjustments.new(line_item).update
-        line_item.save!
+        Spree::ItemAdjustments.new(record).update
+        record.save!
       end
 
       Spree::OrderUpdater.new(order).update
       order.save!
     end
 
-    def match_line_items_to_tax_lines(order, avatax_result)
+    # returns an array like:
+    # [
+    #   {tax_line: {...}, record: #<Spree::LineItem id=111>},
+    #   {tax_line: {...}, record: #<Spree::LineItem id=222>},
+    #   {tax_line: {...}, record: #<Spree::Shipment id=111>},
+    # ]
+    def build_tax_line_data(order, avatax_result)
       # Array.wrap is required because the XML engine the Avatax gem uses turns child nodes into
       #   {...} instead of [{...}] when there is only one child.
       tax_lines = Array.wrap(avatax_result[:tax_lines][:tax_line])
 
-      if tax_lines.size != order.line_items.size
-        raise InvalidApiResponse.new("Avatax response has #{tax_lines.size} items which does not match the supplied #{order.line_items.size} line items.")
+      # builds a hash like: {"L-111": {record: #<Spree::LineItem ...>}, ...}
+      data = (order.line_items + order.shipments).map { |r| [avatax_id(r), {record: r}] }.to_h
+
+      # adds :tax_line to each entry in the data
+      tax_lines.each do |tax_line|
+        avatax_id = tax_line[:no]
+        if data[avatax_id]
+          data[avatax_id][:tax_line] = tax_line
+        else
+          raise InvalidApiResponse.new("Couldn't find #{avatax_id.inspect}")
+        end
       end
 
-      order.line_items.inject({}) do |hash, line_item|
-        tax_line = tax_lines.detect { |l| l[:no] == line_item.id.to_s }
-        if tax_line.nil?
-          raise InvalidApiResponse.new("Couldn't find tax line for line item #{line_item.id}")
-        end
-        hash[line_item] = tax_line
-        hash
+      missing = data.select { |avatax_id, data| data[:tax_line].nil? }
+      if missing.any?
+        raise InvalidApiResponse.new("missing tax data for #{missing.keys}")
       end
+
+      data.values
+    end
+
+    # sometimes we have to store different types of things in a single array (like line items and
+    # shipments). this allows us to provide a unique identifier to each record.
+    def avatax_id(record)
+      "#{record.class.name}-#{record.id}"
     end
 
     private
@@ -84,7 +109,10 @@ module SpreeAvatax::SalesShared
 
         commit: false, # we commit separately after the order completes
 
-        discount: order.promotion_adjustment_total.round(2).to_f,
+        # NOTE: we only want order-level adjustments here. not line item or shipping adjustments.
+        #       avatax distributes order-level discounts across all "lineitem" entries that have
+        #       "discounted:true"
+        discount: order.avatax_promotion_adjustment_total.round(2).to_f,
 
         addresses: [
           {
@@ -103,11 +131,10 @@ module SpreeAvatax::SalesShared
     def gettax_lines_params(order)
       line_items = order.line_items.includes(variant: :product)
 
-      line_items.map do |line_item|
+      line_item_lines = line_items.map do |line_item|
         {
           # Required Parameters
-          no:                  line_item.id,
-          itemcode:            line_item.variant.sku,
+          no:                  avatax_id(line_item),
           qty:                 line_item.quantity,
           amount:              line_item.discounted_amount.round(2).to_f,
           origincodeline:      ORIGIN_CODE,
@@ -116,10 +143,34 @@ module SpreeAvatax::SalesShared
           # Best Practice Parameters
           description: REXML::Text.normalize(line_item.variant.product.description.to_s.truncate(100)),
 
-          # Optional Parameters (required for our context)
-          discounted: order.promotion_adjustment_total > 0.0, # Continue to pass this field if we have an order-level discount so the line item gets discount calculated onto it
+          # Optional Parameters
+          itemcode:   line_item.variant.sku,
+          # "discounted" tells avatax to include this item when it distributes order-level discounts
+          # across avatax "lines"
+          discounted: order.avatax_promotion_adjustment_total > 0.0,
         }
       end
+
+      shipment_lines = order.shipments.map do |shipment|
+        {
+          # Required Parameters
+          no:                  avatax_id(shipment),
+          qty:                 1,
+          amount:              shipment.discounted_amount.round(2).to_f,
+          origincodeline:      ORIGIN_CODE,
+          destinationcodeline: DESTINATION_CODE,
+
+          # Best Practice Parameters
+          description: SHIPPING_DESCRIPTION,
+
+          # Optional Parameters
+          taxcode:    SHIPPING_TAX_CODE,
+          # order-level discounts do not apply to shipments
+          discounted: false,
+        }
+      end
+
+      line_item_lines + shipment_lines
     end
 
     def reset_tax_attributes(order)

@@ -1,16 +1,31 @@
 require 'spec_helper'
 
 describe SpreeAvatax::SalesInvoice do
-
   describe '.generate' do
     subject do
       SpreeAvatax::SalesInvoice.generate(order)
     end
 
-    let(:order) { create(:shipped_order, line_items_count: 1) }
-    let(:line_item) { order.line_items.first }
+    let(:order) do
+      create(:shipped_order, {
+        line_items_count: 1,
+        ship_address: create(:address, {
+          address1: "1234 Way",
+          address2: "",
+          city: "New York",
+          state: state,
+          country: country,
+          zipcode: "10010",
+          phone: "111-111-1111",
+        })
+      })
+    end
 
-    let!(:tax_rate) { create :tax_rate, name: 'Avatax No Op', calculator: create(:avatax_tax_calculator) }
+    let(:line_item) { order.line_items.first }
+    let(:shipment) { order.shipments.first }
+
+    let(:country) { create(:country) }
+    let(:state) { create(:state, country: country, name: 'New York', abbr: 'NY') }
 
     let(:expected_gettax_params) do
       {
@@ -23,7 +38,7 @@ describe SpreeAvatax::SalesInvoice do
 
         commit: false,
 
-        discount: order.promotion_adjustment_total.round(2).to_f,
+        discount: order.avatax_promotion_adjustment_total.round(2).to_f,
 
         addresses: [
           {
@@ -36,9 +51,8 @@ describe SpreeAvatax::SalesInvoice do
         ],
 
         lines: [
-          {
-            no:                  line_item.id,
-            itemcode:            line_item.variant.sku,
+          { # line item
+            no:                  "Spree::LineItem-#{line_item.id}",
             qty:                 line_item.quantity,
             amount:              line_item.discounted_amount.round(2).to_f,
             origincodeline:      SpreeAvatax::SalesShared::ORIGIN_CODE,
@@ -46,20 +60,37 @@ describe SpreeAvatax::SalesInvoice do
 
             description: expected_truncated_description,
 
-            discounted: order.promotion_adjustment_total > 0.0,
+            itemcode:   line_item.variant.sku,
+            discounted: order.avatax_promotion_adjustment_total > 0.0,
           },
-        ]
+          { # shipping charge
+            no:                  "Spree::Shipment-#{shipment.id}",
+            qty:                 1,
+            amount:              shipment.discounted_amount.round(2).to_f,
+            origincodeline:      SpreeAvatax::SalesShared::ORIGIN_CODE,
+            destinationcodeline: SpreeAvatax::SalesShared::DESTINATION_CODE,
+
+            description: SpreeAvatax::SalesShared::SHIPPING_DESCRIPTION,
+
+            taxcode:    SpreeAvatax::SalesShared::SHIPPING_TAX_CODE,
+            discounted: false,
+          },
+        ],
       }
     end
 
     let(:expected_truncated_description) { line_item.variant.product.description.truncate(100) }
-    let(:gettax_response) { sales_invoice_gettax_response(order.number, line_item.id) }
+    let(:gettax_response) { sales_invoice_gettax_response(order.number, line_item, shipment) }
     let(:gettax_response_line_item_tax_line) { Array.wrap(gettax_response[:tax_lines][:tax_line]).first }
+    let(:gettax_response_shipment_tax_line) { Array.wrap(gettax_response[:tax_lines][:tax_line]).last }
     let(:order_calculated_tax) do
       BigDecimal.new(gettax_response[:total_tax])
     end
     let(:line_item_calculated_tax) do
       BigDecimal.new(gettax_response_line_item_tax_line[:tax]).abs
+    end
+    let(:shipment_calculated_tax) do
+      BigDecimal.new(gettax_response_shipment_tax_line[:tax]).abs
     end
 
     let!(:gettax_stub) do
@@ -96,12 +127,27 @@ describe SpreeAvatax::SalesInvoice do
       }.to change { line_item.reload.additional_tax_total }.from(0).to(line_item_calculated_tax)
     end
 
+    it 'persists the results to the shipments' do
+      expect {
+        subject
+      }.to change { shipment.reload.additional_tax_total }.from(0).to(shipment_calculated_tax)
+    end
+
     it "creates a line item adjustment" do
       subject
       expect(line_item.adjustments.tax.count).to eq 1
       adjustment = line_item.adjustments.first
       expect(adjustment.amount).to eq line_item_calculated_tax
-      expect(adjustment.source).to eq tax_rate
+      expect(adjustment.source).to eq Spree::TaxRate.first
+      expect(adjustment.state).to eq 'closed'
+    end
+
+    it "creates a shipment adjustment" do
+      subject
+      expect(shipment.adjustments.tax.count).to eq 1
+      adjustment = shipment.adjustments.first
+      expect(adjustment.amount).to eq shipment_calculated_tax
+      expect(adjustment.source).to eq Spree::TaxRate.first
       expect(adjustment.state).to eq 'closed'
     end
 
