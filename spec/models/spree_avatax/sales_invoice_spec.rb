@@ -38,7 +38,7 @@ describe SpreeAvatax::SalesInvoice do
 
         commit: false,
 
-        discount: order.avatax_promotion_adjustment_total.round(2).to_f,
+        discount: order.avatax_order_adjustment_total.round(2).to_f,
 
         addresses: [
           {
@@ -61,7 +61,7 @@ describe SpreeAvatax::SalesInvoice do
             description: expected_truncated_description,
 
             itemcode:   line_item.variant.sku,
-            discounted: order.avatax_promotion_adjustment_total > 0.0,
+            discounted: order.avatax_order_adjustment_total > 0.0,
           },
           { # shipping charge
             no:                  "Spree::Shipment-#{shipment.id}",

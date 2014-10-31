@@ -112,7 +112,9 @@ module SpreeAvatax::SalesShared
         # NOTE: we only want order-level adjustments here. not line item or shipping adjustments.
         #       avatax distributes order-level discounts across all "lineitem" entries that have
         #       "discounted:true"
-        discount: order.avatax_promotion_adjustment_total.round(2).to_f,
+        #       Also, the "discount" can be negative and Avatax handles that OK. A negative number
+        #       would mean that *charges* were added to the order via an order-level adjustment.
+        discount: order.avatax_order_adjustment_total.round(2).to_f,
 
         addresses: [
           {
@@ -147,7 +149,7 @@ module SpreeAvatax::SalesShared
           itemcode:   line_item.variant.sku,
           # "discounted" tells avatax to include this item when it distributes order-level discounts
           # across avatax "lines"
-          discounted: order.avatax_promotion_adjustment_total > 0.0,
+          discounted: order.avatax_order_adjustment_total != 0,
         }
       end
 

@@ -21,8 +21,13 @@ Spree::Order.class_eval do
     SpreeAvatax::SalesInvoice.cancel(order)
   end
 
-  def avatax_promotion_adjustment_total
-    adjustments.promotion.eligible.sum(:amount).abs
+  # The total of discounts and charges added at the order level.
+  # This intentionally excludes line item & shipment level discounts as those are sent to avatax
+  # by being wrapped into net amount of the line item/shipment itself.
+  def avatax_order_adjustment_total
+    # We invert the sign because avatax calls this the "discount" even though it can handle charges
+    # as well as discounts
+    -adjustments.non_tax.eligible.sum(:amount)
   end
 
   def avatax_order_after_save
