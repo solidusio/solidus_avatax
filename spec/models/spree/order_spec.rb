@@ -81,21 +81,32 @@ describe Spree::Order do
     end
   end
 
-  describe '#avatax_promotion_adjustment_total' do
+  describe '#avatax_order_adjustment_total' do
     context 'no adjustments exist' do
       it 'returns 0' do
-        expect(subject.avatax_promotion_adjustment_total).to eq 0
+        expect(subject.avatax_order_adjustment_total).to eq 0
       end
     end
 
-    context 'there are eligible adjustments' do
-      before do
-        subject.adjustments.create(source_type: "Spree::PromotionAction", eligible: false, amount: -5.0, label: 'Promo One')
-        subject.adjustments.create(source_type: "Spree::PromotionAction", eligible: true, amount: -10.99, label: 'Promo Two')
+    context 'eligible non-tax adjustments exist' do
+      let!(:non_eligible_promo_adjustment) do
+        subject.adjustments.create!(source_type: 'Spree::PromotionAction', eligible: false, amount: -1.0, label: 'bad promo')
+      end
+      let!(:eligible_promo_adjustment) do
+        subject.adjustments.create!(source_type: 'Spree::PromotionAction', eligible: true, amount: -10.0, label: 'good promo')
+      end
+      let!(:eligible_non_promo_adjustment) do
+        subject.adjustments.create!(source_type: nil, eligible: true, amount: -100.0, label: 'non-promo')
+      end
+      let!(:eligible_positive_adjustment) do
+        subject.adjustments.create!(source_type: nil, eligible: true, amount: 1000.0, label: 'positive non-promo')
+      end
+      let(:eligible_total) do
+        eligible_promo_adjustment.amount + eligible_non_promo_adjustment.amount + eligible_positive_adjustment.amount
       end
 
-      it 'returns 10.99' do
-        expect(subject.avatax_promotion_adjustment_total).to eq BigDecimal("10.99")
+      it 'returns the correct amount' do
+        expect(subject.avatax_order_adjustment_total).to eq -eligible_total
       end
     end
   end
