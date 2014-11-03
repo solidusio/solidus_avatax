@@ -155,20 +155,19 @@ describe SpreeAvatax::SalesOrder do
       let(:line1) { "<&line1>" }
       let(:line2) { "<&line2>" }
       let(:city) { "<&city>" }
-      let(:zipcode) { "<12345>" }
       let(:email) { "test&@test.com" }
       let(:description) { "A description <wi>&/th xml characters" }
 
       before(:each) do
         ship_address = order.ship_address
-        ship_address.update_columns(address1: line1, address2: line2, city: city, zipcode: zipcode)
+        ship_address.update_columns(address1: line1, address2: line2, city: city)
         order.update_columns(email: email)
         line_item.variant.product.update_columns(description: description)
       end
 
       let(:expected_gettax_params) do
         super().tap do |params|
-          params[:addresses].first.merge!(line1: REXML::Text.normalize(line1), line2: REXML::Text.normalize(line2), city: REXML::Text.normalize(city), postalcode: REXML::Text.normalize(zipcode))
+          params[:addresses].first.merge!(line1: REXML::Text.normalize(line1), line2: REXML::Text.normalize(line2), city: REXML::Text.normalize(city))
           params[:customercode] = REXML::Text.normalize(email)
           params[:lines][0][:description] = REXML::Text.normalize(description)
         end
