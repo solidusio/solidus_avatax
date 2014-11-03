@@ -141,10 +141,10 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
         addresses: [
           {
             addresscode: ADDRESS_CODE,
-            line1:       reimbursement.order.ship_address.address1,
-            line2:       reimbursement.order.ship_address.address2,
-            city:        reimbursement.order.ship_address.city,
-            postalcode:  reimbursement.order.ship_address.zipcode,
+            line1:       REXML::Text.normalize(reimbursement.order.ship_address.address1),
+            line2:       REXML::Text.normalize(reimbursement.order.ship_address.address2),
+            city:        REXML::Text.normalize(reimbursement.order.ship_address.city),
+            postalcode:  REXML::Text.normalize(reimbursement.order.ship_address.zipcode),
           },
         ],
 
@@ -166,7 +166,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
           destinationcodeline: DESTINATION_CODE,
 
           # Best Practice Parameters
-          description: return_item.inventory_unit.line_item.variant.product.description.to_s[0...100],
+          description: REXML::Text.normalize(return_item.inventory_unit.line_item.variant.product.description.to_s[0...100]),
         }
       end
     end

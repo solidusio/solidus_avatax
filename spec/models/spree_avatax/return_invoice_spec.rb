@@ -4,6 +4,7 @@ describe SpreeAvatax::ReturnInvoice do
 
   describe '.generate' do
     let(:reimbursement) { create(:reimbursement) }
+    let(:order) { reimbursement.order }
     let(:return_item) { reimbursement.return_items.first }
 
     let(:expected_gettax_params) do
@@ -25,10 +26,10 @@ describe SpreeAvatax::ReturnInvoice do
         addresses: [
           {
             addresscode: SpreeAvatax::ReturnInvoice::ADDRESS_CODE,
-            line1:       reimbursement.order.ship_address.address1,
-            line2:       reimbursement.order.ship_address.address2,
-            city:        reimbursement.order.ship_address.city,
-            postalcode:  reimbursement.order.ship_address.zipcode,
+            line1:       REXML::Text.normalize(reimbursement.order.ship_address.address1),
+            line2:       REXML::Text.normalize(reimbursement.order.ship_address.address2),
+            city:        REXML::Text.normalize(reimbursement.order.ship_address.city),
+            postalcode:  REXML::Text.normalize(reimbursement.order.ship_address.zipcode),
           },
         ],
         lines: [
@@ -40,7 +41,7 @@ describe SpreeAvatax::ReturnInvoice do
             origincodeline:      SpreeAvatax::ReturnInvoice::ORIGIN_CODE,
             destinationcodeline: SpreeAvatax::ReturnInvoice::DESTINATION_CODE,
 
-            description: expected_truncated_description,
+            description: REXML::Text.normalize(expected_truncated_description),
           },
         ],
       }
@@ -121,6 +122,31 @@ describe SpreeAvatax::ReturnInvoice do
 
       it 'succeeds' do
         subject # method expectation will fail if date isn't right
+      end
+    end
+
+    context 'user input contains XML characters' do
+      let(:line1) { "<&line1>" }
+      let(:line2) { "<&line2>" }
+      let(:city) { "<&city>" }
+      let(:zipcode) { "<12345>" }
+      let(:description) { "A description <wi>&/th xml characters" }
+
+      before(:each) do
+        ship_address = order.ship_address
+        ship_address.update_columns(address1: line1, address2: line2, city: city, zipcode: zipcode)
+        return_item.inventory_unit.line_item.variant.product.update_columns(description: description)
+      end
+
+      let(:expected_gettax_params) do
+        super().tap do |params|
+          params[:addresses].first.merge!(line1: REXML::Text.normalize(line1), line2: REXML::Text.normalize(line2), city: REXML::Text.normalize(city), postalcode: REXML::Text.normalize(zipcode))
+          params[:lines][0][:description] = REXML::Text.normalize(description)
+        end
+      end
+
+      it 'succeeds' do
+        subject
       end
     end
   end
