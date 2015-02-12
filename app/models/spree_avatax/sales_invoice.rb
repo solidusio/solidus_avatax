@@ -23,7 +23,7 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     def generate(order)
       bench_start = Time.now
 
-      return if !SpreeAvatax::Shared.taxable_order?(order)
+      return if order.completed? || !SpreeAvatax::Shared.taxable_order?(order)
 
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
       # run this immediately to ensure that everything matches up before modifying the database

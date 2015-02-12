@@ -7,18 +7,17 @@ describe SpreeAvatax::SalesInvoice do
     end
 
     let(:order) do
-      create(:shipped_order, {
-        line_items_count: 1,
-        ship_address: create(:address, {
-          address1: "1234 Way",
-          address2: "",
-          city: "New York",
-          state: state,
-          country: country,
-          zipcode: "10010",
-          phone: "111-111-1111",
-        })
-      })
+      create(:order_with_line_items,
+             line_items_count: 1,
+             ship_address: create(:address, {
+               address1: "1234 Way",
+               address2: "",
+               city: "New York",
+               state: state,
+               country: country,
+               zipcode: "10010",
+               phone: "1111111111",
+             }))
     end
 
     let(:line_item) { order.line_items.first }
@@ -235,7 +234,7 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       context 'when the existing invoice is committed' do
-        let!(:previous_sales_invoice) { create(:avatax_sales_invoice, order: order, committed_at: order.completed_at) }
+        let!(:previous_sales_invoice) { create(:avatax_sales_invoice, order: order, committed_at: 1.day.ago) }
 
         it 'raises an AlreadyCommittedError' do
           expect {
@@ -260,6 +259,24 @@ describe SpreeAvatax::SalesInvoice do
 
     context 'when the order is not taxable' do
       let(:order) { create(:order_with_line_items, ship_address: nil, line_items_count: 1) }
+
+      let!(:gettax_stub) { }
+
+      it 'does not create a sales invoice' do
+        expect {
+          subject
+        }.not_to change { SpreeAvatax::SalesInvoice.count }
+        expect(order.avatax_sales_invoice).to eq nil
+      end
+
+      it 'does not call avatax' do
+        SpreeAvatax::Shared.tax_svc.should_receive(:gettax).never
+        subject
+      end
+    end
+
+    context 'when the order is already completed' do
+      let(:order) { create(:completed_order_with_totals) }
 
       let!(:gettax_stub) { }
 

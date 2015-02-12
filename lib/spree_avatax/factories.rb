@@ -21,7 +21,7 @@ FactoryGirl.define do
     association :order, factory: :shipped_order
     doc_id { generate(:doc_id) }
     doc_code { order.number }
-    doc_date { order.completed_at.to_date }
+    doc_date { order.completed_at.try(:to_date) || 1.day.ago }
     pre_tax_total { order.line_items.sum(:pre_tax_amount) }
     additional_tax_total { order.line_items.sum(:additional_tax_total) }
   end

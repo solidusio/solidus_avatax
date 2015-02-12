@@ -8,7 +8,7 @@ describe SpreeAvatax::SalesOrder do
     end
 
     let(:order) do
-      create(:shipped_order, {
+      create(:order_with_line_items, {
         line_items_count: 1,
         ship_address: create(:address, {
           address1: "1234 Way",
@@ -257,6 +257,24 @@ describe SpreeAvatax::SalesOrder do
           subject
         }.not_to change { SpreeAvatax::SalesOrder.count }
         expect(order.avatax_sales_orders.count).to eq 0
+      end
+
+      it 'does not call avatax' do
+        SpreeAvatax::Shared.tax_svc.should_receive(:gettax).never
+        subject
+      end
+    end
+
+    context 'when the order is already completed' do
+      let(:order) { create(:completed_order_with_totals) }
+
+      let!(:gettax_stub) { }
+
+      it 'does not create a sales invoice' do
+        expect {
+          subject
+        }.not_to change { SpreeAvatax::SalesInvoice.count }
+        expect(order.avatax_sales_invoice).to eq nil
       end
 
       it 'does not call avatax' do
