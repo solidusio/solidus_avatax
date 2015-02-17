@@ -17,6 +17,8 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
     # On success it updates taxes on the order and its line items and create a SalesOrder record.
     #   At this point nothing is saved on Avatax's end.
     def generate(order)
+      bench_start = Time.now
+
       return if !SpreeAvatax::Shared.taxable_order?(order)
 
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
@@ -40,6 +42,9 @@ class SpreeAvatax::SalesOrder < ActiveRecord::Base
       else
         raise
       end
+    ensure
+      duration = Time.now - bench_start
+      Rails.logger.info "avatax_sales_order_generate_duration=#{(duration*1000).round}"
     end
   end
 end
