@@ -21,6 +21,8 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     # After the order completes the ".commit" method will get called and we'll commit the
     #   sales invoice, which marks it as complete on Avatax's end.
     def generate(order)
+      bench_start = Time.now
+
       return if !SpreeAvatax::Shared.taxable_order?(order)
 
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
@@ -53,6 +55,9 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
       else
         raise
       end
+    ensure
+      duration = (Time.now - bench_start).round
+      Rails.logger.info "avatax_sales_invoice_generate_duration=#{(duration*1000).round}"
     end
 
     def commit(order)
