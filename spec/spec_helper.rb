@@ -1,12 +1,6 @@
 # Additional requirements
 require 'avatax_taxservice'
 require 'hashie'
-require 'honeybadger'
-require 'pagerduty'
-
-Honeybadger.configure do |config|
-  config.api_key = 'SOME-FAKE-KEY'
-end
 
 # Run Coverage report
 require 'simplecov'

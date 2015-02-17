@@ -21,11 +21,6 @@ Spree::TaxRate.class_eval do
     # require exactly one tax rate.  if that's not true then alert ourselves and carry on as best we can
     def avatax_the_one_rate
       rates = all.to_a
-      if rates.size != 1
-        if defined?(Honeybadger)
-          Honeybadger.notify("#{rates.size} tax rates detected and there should be only one")
-        end
-      end
       rates.sort_by(&:id).first
     end
   end

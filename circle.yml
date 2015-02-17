@@ -1,0 +1,3 @@
+database:
+  override:
+    - bundle exec rake test_app

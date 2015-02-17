@@ -23,12 +23,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rails',   '~>4.0.3'
 
-  # Required to test Honeybadger alerting
-  s.add_development_dependency 'honeybadger'
-
-  # Required to test Pagerduty alerting
-  s.add_development_dependency 'pagerduty'
-
   s.add_development_dependency 'capybara',        '~> 2.1'
   s.add_development_dependency 'coffee-rails'
   s.add_development_dependency 'database_cleaner'
