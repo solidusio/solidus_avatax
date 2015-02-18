@@ -1,4 +1,8 @@
+require 'new_relic/agent/method_tracer'
+
 module SpreeAvatax::SalesShared
+  extend ::NewRelic::Agent::MethodTracer
+
   ADDRESS_CODE = "1"
   DESTINATION_CODE = "1"
   ORIGIN_CODE = "1"
@@ -175,33 +179,51 @@ module SpreeAvatax::SalesShared
       line_item_lines + shipment_lines
     end
 
+    def bench(method, metric)
+      result, duration = nil
+      SpreeAvatax::SalesShared.trace_execution_scoped(["Custom/#{method}/#{metric}"]) do
+        duration = Benchmark.ms do
+          result = yield
+        end
+      end
+      Rails.logger.info "#{method}_#{metric}_ms=#{duration.round}"
+      result
+    end
+
     def reset_tax_attributes(order)
-      bench_start = Time.now
-      order.all_adjustments.tax.destroy_all
-
-      order.line_items.each do |line_item|
-        line_item.update_attributes!({
-          additional_tax_total: 0,
-          adjustment_total: 0,
-          pre_tax_amount: 0,
-          included_tax_total: 0,
-        })
-
-        Spree::ItemAdjustments.new(line_item).update
-        line_item.save!
+      bench('reset_tax', 'adjustments') do
+        order.all_adjustments.tax.destroy_all
       end
 
-      order.update_attributes!({
-        additional_tax_total: 0,
-        adjustment_total: 0,
-        included_tax_total: 0,
-      })
+      bench('reset_tax', 'line_items') do
+        order.line_items.each do |line_item|
+          line_item.update_attributes!({
+            additional_tax_total: 0,
+            adjustment_total: 0,
+            pre_tax_amount: 0,
+            included_tax_total: 0,
+          })
 
-      Spree::OrderUpdater.new(order).update
-      order.save!
-    ensure
-      duration = Time.now - bench_start
-      Rails.logger.info "avatax_reset_tax_attributes_duration=#{(duration*1000).round}"
+          Spree::ItemAdjustments.new(line_item).update
+          line_item.save!
+        end
+      end
+
+      bench('reset_tax', 'order') do
+        order.update_attributes!({
+          additional_tax_total: 0,
+          adjustment_total: 0,
+          included_tax_total: 0,
+        })
+      end
+
+      bench('reset_tax', 'updater') do
+        Spree::OrderUpdater.new(order).update
+      end
+
+      bench('reset_tax', 'save') do
+        order.save!
+      end
     end
   end
 end
