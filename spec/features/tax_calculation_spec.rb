@@ -13,8 +13,8 @@ describe "Tax Calculation" do
 
   context "without discounts" do
     subject do
-      VCR.use_cassette('sales_order_gettax_without_discounts') do
-        SpreeAvatax::SalesOrder.generate(order)
+      VCR.use_cassette('sales_invoice_gettax_without_discounts') do
+        SpreeAvatax::SalesInvoice.generate(order)
       end
     end
 
@@ -27,8 +27,8 @@ describe "Tax Calculation" do
 
   context "with discounts" do
     subject do
-      VCR.use_cassette('sales_order_gettax_with_discounts') do
-        SpreeAvatax::SalesOrder.generate(order)
+      VCR.use_cassette('sales_invoice_gettax_with_discounts') do
+        SpreeAvatax::SalesInvoice.generate(order)
       end
     end
 

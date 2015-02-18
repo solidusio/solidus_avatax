@@ -9,8 +9,8 @@ describe Spree::OrderContents do
 
     subject { order_contents.add_with_avatax(variant) }
 
-    it 'recomputes tax' do
-      expect(SpreeAvatax::SalesOrder).to receive(:generate).with(order)
+    it 'clears tax' do
+      expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
       subject
     end
   end
@@ -19,7 +19,7 @@ describe Spree::OrderContents do
     subject { order_contents.remove_with_avatax(order.line_items.first.variant) }
 
     it 'recomputes tax' do
-      expect(SpreeAvatax::SalesOrder).to receive(:generate).with(order)
+      expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
       subject
     end
   end
@@ -28,7 +28,7 @@ describe Spree::OrderContents do
     subject { order_contents.update_cart_with_avatax({}) }
 
     it 'recomputes tax' do
-      expect(SpreeAvatax::SalesOrder).to receive(:generate).with(order)
+      expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
       subject
     end
   end
