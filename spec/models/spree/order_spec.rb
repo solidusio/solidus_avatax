@@ -50,8 +50,8 @@ describe Spree::Order do
       subject.update_attributes!(state: 'address')
     end
 
-    it "generates a sales invoice" do
-      expect(SpreeAvatax::SalesOrder).to receive(:generate).with(subject)
+    it "clears tax" do
+      expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
       subject.next!
     end
   end

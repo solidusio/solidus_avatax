@@ -95,6 +95,51 @@ module SpreeAvatax::SalesShared
       "#{record.class.name}-#{record.id}"
     end
 
+
+    # Clears previously-set tax attributes from an order, if any, unless the
+    # order has already been completed.
+    #
+    # @param order [Spree::Order] the order
+    def reset_tax_attributes(order)
+      return if order.completed?
+
+      destroyed_adjustments = bench('reset_tax', 'adjustments') do
+        order.all_adjustments.tax.destroy_all
+      end
+
+      return if destroyed_adjustments.empty?
+
+      bench('reset_tax', 'line_items') do
+        order.line_items.each do |line_item|
+          line_item.update_attributes!({
+            additional_tax_total: 0,
+            adjustment_total: 0,
+            pre_tax_amount: 0,
+            included_tax_total: 0,
+          })
+
+          Spree::ItemAdjustments.new(line_item).update
+          line_item.save!
+        end
+      end
+
+      bench('reset_tax', 'order') do
+        order.update_attributes!({
+          additional_tax_total: 0,
+          adjustment_total: 0,
+          included_tax_total: 0,
+        })
+      end
+
+      bench('reset_tax', 'updater') do
+        Spree::OrderUpdater.new(order).update
+      end
+
+      bench('reset_tax', 'save') do
+        order.save!
+      end
+    end
+
     private
 
     def logger
@@ -190,40 +235,5 @@ module SpreeAvatax::SalesShared
       result
     end
 
-    def reset_tax_attributes(order)
-      bench('reset_tax', 'adjustments') do
-        order.all_adjustments.tax.destroy_all
-      end
-
-      bench('reset_tax', 'line_items') do
-        order.line_items.each do |line_item|
-          line_item.update_attributes!({
-            additional_tax_total: 0,
-            adjustment_total: 0,
-            pre_tax_amount: 0,
-            included_tax_total: 0,
-          })
-
-          Spree::ItemAdjustments.new(line_item).update
-          line_item.save!
-        end
-      end
-
-      bench('reset_tax', 'order') do
-        order.update_attributes!({
-          additional_tax_total: 0,
-          adjustment_total: 0,
-          included_tax_total: 0,
-        })
-      end
-
-      bench('reset_tax', 'updater') do
-        Spree::OrderUpdater.new(order).update
-      end
-
-      bench('reset_tax', 'save') do
-        order.save!
-      end
-    end
   end
 end

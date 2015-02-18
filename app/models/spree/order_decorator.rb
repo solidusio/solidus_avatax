@@ -1,12 +1,11 @@
 Spree::Order.class_eval do
 
   has_one  :avatax_sales_invoice, class_name: 'SpreeAvatax::SalesInvoice', inverse_of: :order
-  has_many :avatax_sales_orders,  class_name: 'SpreeAvatax::SalesOrder', inverse_of: :order
 
   after_save :avatax_order_after_save
 
   state_machine.after_transition from: :address do |order, transition|
-    SpreeAvatax::SalesOrder.generate(order)
+    SpreeAvatax::SalesShared.reset_tax_attributes(order)
   end
 
   state_machine.before_transition to: :confirm do |order, transition|
