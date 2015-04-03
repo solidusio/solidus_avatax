@@ -45,13 +45,13 @@ describe SpreeAvatax::SalesShared do
 
     it 'should remove tax adjustments even if they are not reachable through a line item anymore' do
       disassociated_adjustment = order.adjustments.eligible.tax.additional.create!({
-        adjustable_type: 'Spree::LineItem',
-        adjustable_id: 99999,
+        adjustable: order.line_items.first,
         amount: 6.66,
         order: order,
         label: 'Test',
         included: false
       })
+      disassociated_adjustment.update_columns(adjustable_id: nil)
       subject
       # make sure this got deleted
       expect { disassociated_adjustment.reload }.to raise_error(ActiveRecord::RecordNotFound)

@@ -90,16 +90,16 @@ describe Spree::Order do
 
     context 'eligible non-tax adjustments exist' do
       let!(:non_eligible_promo_adjustment) do
-        subject.adjustments.create!(source_type: 'Spree::PromotionAction', eligible: false, amount: -1.0, label: 'bad promo')
+        subject.adjustments.create!(order: order, source_type: 'Spree::PromotionAction', eligible: false, amount: -1.0, label: 'bad promo')
       end
       let!(:eligible_promo_adjustment) do
-        subject.adjustments.create!(source_type: 'Spree::PromotionAction', eligible: true, amount: -10.0, label: 'good promo')
+        subject.adjustments.create!(order: order, source_type: 'Spree::PromotionAction', eligible: true, amount: -10.0, label: 'good promo')
       end
       let!(:eligible_non_promo_adjustment) do
-        subject.adjustments.create!(source_type: nil, eligible: true, amount: -100.0, label: 'non-promo')
+        subject.adjustments.create!(order: order, source_type: nil, eligible: true, amount: -100.0, label: 'non-promo')
       end
       let!(:eligible_positive_adjustment) do
-        subject.adjustments.create!(source_type: nil, eligible: true, amount: 1000.0, label: 'positive non-promo')
+        subject.adjustments.create!(order: order, source_type: nil, eligible: true, amount: 1000.0, label: 'positive non-promo')
       end
       let(:eligible_total) do
         eligible_promo_adjustment.amount + eligible_non_promo_adjustment.amount + eligible_positive_adjustment.amount
