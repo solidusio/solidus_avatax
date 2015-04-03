@@ -33,23 +33,38 @@ describe "Tax Calculation" do
     end
 
     let(:promotion) do
-      promo = create(:promotion, code: "order_promotion")
-      calculator = Spree::Calculator::FlatRate.new
-      calculator.preferred_amount = 10
-      Spree::Promotion::Actions::CreateAdjustment.create!(calculator: calculator, promotion: promo)
-      promo
+      FactoryGirl.create(
+        :promotion,
+        code: "order_promotion",
+        promotion_actions: [
+          Spree::Promotion::Actions::CreateAdjustment.new(
+            calculator: Spree::Calculator::FlatRate.new(preferred_amount: 10),
+          ),
+        ],
+      )
     end
 
     let(:line_item_promotion) do
-      promo = create(:promotion_with_item_adjustment, code: 'line_item_promotion')
-      promo.rules << Spree::Promotion::Rules::Product.create!(preferred_match_policy: 'any', product_ids_string: order.line_items.first.product.id.to_s)
-      promo
+      FactoryGirl.create(
+        :promotion_with_item_adjustment,
+        code: 'line_item_promotion',
+        promotion_rules: [
+          Spree::Promotion::Rules::Product.new(
+            preferred_match_policy: 'any',
+            product_ids_string: order.line_items.first.product.id.to_s,
+          ),
+        ],
+      )
     end
 
     before do
       order.line_items.each { |li| li.update_attributes!(price: 50.0) }
-      PromotionSupport.set_order_promotion(order)
-      PromotionSupport.set_line_item_promotion(order)
+
+      order.coupon_code = promotion.codes.first.value
+      Spree::PromotionHandler::Coupon.new(order).apply
+
+      order.coupon_code = line_item_promotion.codes.first.value
+      Spree::PromotionHandler::Coupon.new(order).apply
     end
 
     it "computes taxes for a line item" do
@@ -59,14 +74,13 @@ describe "Tax Calculation" do
     end
   end
 
-end
-
-def setup_configs
-  @avalara_config = YAML.load_file("spec/avalara_config.yml")
-  SpreeAvatax::Config.password = @avalara_config['password']
-  SpreeAvatax::Config.username = @avalara_config['username']
-  SpreeAvatax::Config.use_production_account = false
-  SpreeAvatax::Config.company_code = 'Bonobos'
-rescue => e
-  skip("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
+  def setup_configs
+    @avalara_config = YAML.load_file("spec/avalara_config.yml")
+    SpreeAvatax::Config.password = @avalara_config['password']
+    SpreeAvatax::Config.username = @avalara_config['username']
+    SpreeAvatax::Config.use_production_account = false
+    SpreeAvatax::Config.company_code = 'Bonobos'
+  rescue => e
+    skip("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
+  end
 end
