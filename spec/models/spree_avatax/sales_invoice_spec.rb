@@ -41,7 +41,7 @@ describe SpreeAvatax::SalesInvoice do
 
         addresses: [
           {
-            addresscode: SpreeAvatax::SalesShared::ADDRESS_CODE,
+            addresscode: SpreeAvatax::SalesShared::DESTINATION_CODE,
             line1:       REXML::Text.normalize(order.ship_address.address1),
             line2:       REXML::Text.normalize(order.ship_address.address2),
             city:        REXML::Text.normalize(order.ship_address.city),
@@ -54,7 +54,7 @@ describe SpreeAvatax::SalesInvoice do
             no:                  "Spree::LineItem-#{line_item.id}",
             qty:                 line_item.quantity,
             amount:              line_item.discounted_amount.round(2).to_f,
-            origincodeline:      SpreeAvatax::SalesShared::ORIGIN_CODE,
+            origincodeline:      SpreeAvatax::SalesShared::DESTINATION_CODE,
             destinationcodeline: SpreeAvatax::SalesShared::DESTINATION_CODE,
 
             description: expected_truncated_description,
@@ -66,7 +66,7 @@ describe SpreeAvatax::SalesInvoice do
             no:                  "Spree::Shipment-#{shipment.id}",
             qty:                 1,
             amount:              shipment.discounted_amount.round(2).to_f,
-            origincodeline:      SpreeAvatax::SalesShared::ORIGIN_CODE,
+            origincodeline:      SpreeAvatax::SalesShared::DESTINATION_CODE,
             destinationcodeline: SpreeAvatax::SalesShared::DESTINATION_CODE,
 
             description: SpreeAvatax::SalesShared::SHIPPING_DESCRIPTION,
