@@ -60,7 +60,7 @@ describe SpreeAvatax::SalesInvoice do
             description: expected_truncated_description,
 
             itemcode:   line_item.variant.sku,
-            discounted: order.avatax_order_adjustment_total > 0.0,
+            discounted: true,
           },
           { # shipping charge
             no:                  "Spree::Shipment-#{shipment.id}",

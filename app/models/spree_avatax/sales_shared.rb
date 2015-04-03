@@ -196,7 +196,7 @@ module SpreeAvatax::SalesShared
           itemcode:   line_item.variant.sku,
           # "discounted" tells avatax to include this item when it distributes order-level discounts
           # across avatax "lines"
-          discounted: order.avatax_order_adjustment_total != 0,
+          discounted: true,
         }
       end
 
