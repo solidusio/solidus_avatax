@@ -25,7 +25,7 @@ describe SpreeAvatax::ReturnInvoice do
 
         addresses: [
           {
-            addresscode: SpreeAvatax::ReturnInvoice::ADDRESS_CODE,
+            addresscode: SpreeAvatax::ReturnInvoice::DESTINATION_CODE,
             line1:       REXML::Text.normalize(reimbursement.order.ship_address.address1),
             line2:       REXML::Text.normalize(reimbursement.order.ship_address.address2),
             city:        REXML::Text.normalize(reimbursement.order.ship_address.city),
@@ -38,7 +38,7 @@ describe SpreeAvatax::ReturnInvoice do
             itemcode:            return_item.inventory_unit.line_item.variant.sku,
             qty:                 1,
             amount:              -return_item.pre_tax_amount,
-            origincodeline:      SpreeAvatax::ReturnInvoice::ORIGIN_CODE,
+            origincodeline:      SpreeAvatax::ReturnInvoice::DESTINATION_CODE,
             destinationcodeline: SpreeAvatax::ReturnInvoice::DESTINATION_CODE,
 
             description: REXML::Text.normalize(expected_truncated_description),

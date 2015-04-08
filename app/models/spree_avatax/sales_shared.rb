@@ -3,9 +3,7 @@ require 'new_relic/agent/method_tracer'
 module SpreeAvatax::SalesShared
   extend ::NewRelic::Agent::MethodTracer
 
-  ADDRESS_CODE = "1"
   DESTINATION_CODE = "1"
-  ORIGIN_CODE = "1"
 
   SHIPPING_TAX_CODE = 'FR020100' # docs: http://goo.gl/KuIuxc
 
@@ -167,7 +165,7 @@ module SpreeAvatax::SalesShared
 
         addresses: [
           {
-            addresscode: ADDRESS_CODE,
+            addresscode: DESTINATION_CODE,
             line1:       REXML::Text.normalize(order.ship_address.address1),
             line2:       REXML::Text.normalize(order.ship_address.address2),
             city:        REXML::Text.normalize(order.ship_address.city),
@@ -188,7 +186,7 @@ module SpreeAvatax::SalesShared
           no:                  avatax_id(line_item),
           qty:                 line_item.quantity,
           amount:              line_item.discounted_amount.round(2).to_f,
-          origincodeline:      ORIGIN_CODE,
+          origincodeline:      DESTINATION_CODE, # We don't really send the correct value here
           destinationcodeline: DESTINATION_CODE,
 
           # Best Practice Parameters
@@ -198,7 +196,7 @@ module SpreeAvatax::SalesShared
           itemcode:   line_item.variant.sku,
           # "discounted" tells avatax to include this item when it distributes order-level discounts
           # across avatax "lines"
-          discounted: order.avatax_order_adjustment_total != 0,
+          discounted: true,
         }
       end
 
@@ -208,7 +206,7 @@ module SpreeAvatax::SalesShared
           no:                  avatax_id(shipment),
           qty:                 1,
           amount:              shipment.discounted_amount.round(2).to_f,
-          origincodeline:      ORIGIN_CODE,
+          origincodeline:      DESTINATION_CODE, # We don't really send the correct value here
           destinationcodeline: DESTINATION_CODE,
 
           # Best Practice Parameters

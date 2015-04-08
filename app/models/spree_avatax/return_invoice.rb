@@ -1,9 +1,6 @@
 class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
   DOC_TYPE = 'ReturnInvoice'
 
-  ADDRESS_CODE = "1"
-
-  ORIGIN_CODE = "1"
   DESTINATION_CODE = "1"
 
   TAX_OVERRIDE_TYPE = 'TaxDate'
@@ -140,7 +137,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
 
         addresses: [
           {
-            addresscode: ADDRESS_CODE,
+            addresscode: DESTINATION_CODE,
             line1:       REXML::Text.normalize(reimbursement.order.ship_address.address1),
             line2:       REXML::Text.normalize(reimbursement.order.ship_address.address2),
             city:        REXML::Text.normalize(reimbursement.order.ship_address.city),
@@ -162,7 +159,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
           itemcode:            return_item.inventory_unit.line_item.variant.sku,
           qty:                 1,
           amount:              -return_item.pre_tax_amount,
-          origincodeline:      ORIGIN_CODE,
+          origincodeline:      DESTINATION_CODE, # We don't really send the correct value here
           destinationcodeline: DESTINATION_CODE,
 
           # Best Practice Parameters
