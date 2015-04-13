@@ -4,7 +4,16 @@ module SpreeAvatax::Shared
 
     def initialize(response)
       @response = response
-      @messages = Array.wrap(response[:messages][:message])
+      # avatax seems to have two different error message formats:
+      # https://gist.github.com/jordan-brough/a22163e4551c692365b8
+      # https://gist.github.com/jordan-brough/c778a3417850dfa2307c
+      # We should pester Avatax about this sometime.
+      if @response[:messages].is_a?(Array)
+        @messages = response[:messages]
+      else
+        @messages = Array.wrap(response[:messages][:message])
+      end
+
       super(messages.map { |msg| msg[:summary] })
     end
   end
