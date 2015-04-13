@@ -44,20 +44,45 @@ describe SpreeAvatax::Shared do
     end
 
     context 'when the response if a failure' do
-      let(:response) do
-        {
-          transaction_id: "4315046676197187",
-          result_code: 'Error',
-          messages: {
-            message: {
-              summary: 'Something awful happened.',
+      # See notes in shared.rb about the two formats
+      context 'format 1' do
+        let(:response) do
+          {
+            transaction_id: "4315046676197187",
+            result_code: 'Error',
+            messages: {
+              message: {summary: 'Something awful happened.'},
             },
-          },
-        }
+          }
+        end
+
+        it 'raises a FailedApiResponse' do
+          expect { subject }.to(raise_error { |error|
+            expect(error).to be_a(SpreeAvatax::Shared::FailedApiResponse)
+            expect(error.message).to eq('["Something awful happened."]')
+            expect(error.messages).to eq([{summary: 'Something awful happened.'}])
+          })
+        end
       end
 
-      it 'raises a FailedApiResponse' do
-        expect { subject }.to raise_error(SpreeAvatax::Shared::FailedApiResponse)
+      context 'format 2' do
+        let(:response) do
+          {
+            transaction_id: "4315046676197187",
+            result_code: 'Error',
+            messages: [
+              {summary: 'Something awful happened.'},
+            ],
+          }
+        end
+
+        it 'raises a FailedApiResponse' do
+          expect { subject }.to(raise_error { |error|
+            expect(error).to be_a(SpreeAvatax::Shared::FailedApiResponse)
+            expect(error.message).to eq('["Something awful happened."]')
+            expect(error.messages).to eq([{summary: 'Something awful happened.'}])
+          })
+        end
       end
     end
   end
