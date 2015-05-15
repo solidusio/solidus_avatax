@@ -10,6 +10,12 @@ App Configuration
 
 Running `spree_avatax:install` (see "Installation") will generate [an initializer](https://github.com/bonobos/spree_avatax/blob/2-2-stable/lib/generators/spree_avatax/install/templates/config/initializers/avatax.rb) for your Rails app which you need to modify with your Avatax credentials.
 
+If you want to notify Avatax about short ships you should configure the following:
+
+    Spree::OrderCancellations.short_ship_tax_notifier = ->(unit_cancels) do
+      SpreeAvatax::ShortShipReturnInvoice.generate(unit_cancels: unit_cancels)
+    end
+
 Known Issues
 ------------
 
