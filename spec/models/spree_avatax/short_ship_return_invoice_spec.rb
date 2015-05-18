@@ -14,21 +14,29 @@ describe SpreeAvatax::ShortShipReturnInvoice do
       create(
         :order_with_line_items,
         line_items_price: 10,
-        line_items_count: 1,
+        line_items_count: 2,
       )
     end
 
-    def line_item
+    def line_item_1
       order.line_items.first
     end
 
-    def inventory_unit
-      line_item.inventory_units.first
+    def line_item_2
+      order.line_items.last
+    end
+
+    def inventory_unit_1
+      line_item_1.inventory_units.first
+    end
+
+    def inventory_unit_2
+      line_item_2.inventory_units.first
     end
 
     # add some tax and complete the order
     before do
-      line_item.adjustments.create!(
+      line_item_1.adjustments.create!(
         amount: 1,
         label: 'fake tax',
         order: order,
@@ -74,8 +82,8 @@ describe SpreeAvatax::ShortShipReturnInvoice do
 
           lines: [
             {
-              no:                  inventory_unit.id,
-              itemcode:            inventory_unit.line_item.variant.sku,
+              no:                  inventory_unit_1.id,
+              itemcode:            inventory_unit_1.line_item.variant.sku,
               qty:                 1,
               amount:              -10.to_d,
               origincodeline:      SpreeAvatax::ShortShipReturnInvoice::DESTINATION_CODE,
@@ -86,7 +94,22 @@ describe SpreeAvatax::ShortShipReturnInvoice do
               taxamountline:       -1.to_d,
               taxdateline:         now.to_date,
 
-              description: REXML::Text.normalize(inventory_unit.line_item.variant.product.description[0...100]),
+              description: REXML::Text.normalize(inventory_unit_1.line_item.variant.product.description[0...100]),
+            },
+            {
+              no:                  inventory_unit_2.id,
+              itemcode:            inventory_unit_2.line_item.variant.sku,
+              qty:                 1,
+              amount:              -10.to_d,
+              origincodeline:      SpreeAvatax::ShortShipReturnInvoice::DESTINATION_CODE,
+              destinationcodeline: SpreeAvatax::ShortShipReturnInvoice::DESTINATION_CODE,
+
+              taxoverridetypeline: SpreeAvatax::ShortShipReturnInvoice::TAX_OVERRIDE_TYPE,
+              reasonline:          SpreeAvatax::ShortShipReturnInvoice::TAX_OVERRIDE_REASON,
+              taxamountline:       0.to_d,
+              taxdateline:         now.to_date,
+
+              description: REXML::Text.normalize(inventory_unit_2.line_item.variant.product.description[0...100]),
             },
           ],
         }
@@ -126,7 +149,9 @@ describe SpreeAvatax::ShortShipReturnInvoice do
 
         short_ship_return_invoice = SpreeAvatax::ShortShipReturnInvoice.last
 
-        expect(short_ship_return_invoice.inventory_units).to eq [inventory_unit]
+        expect(short_ship_return_invoice.inventory_units).to eq(
+          [inventory_unit_1, inventory_unit_2]
+        )
       end
     end
 
@@ -134,7 +159,7 @@ describe SpreeAvatax::ShortShipReturnInvoice do
       let(:order2) { create(:order_ready_to_ship) }
 
       let(:unit_cancels1) do
-        Spree::OrderCancellations.new(order).short_ship([inventory_unit])
+        Spree::OrderCancellations.new(order).short_ship([inventory_unit_1])
       end
       let(:unit_cancels2) do
         Spree::OrderCancellations.new(order2).short_ship(order2.inventory_units)

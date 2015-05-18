@@ -90,7 +90,7 @@ class SpreeAvatax::ShortShipReturnInvoice < ActiveRecord::Base
     end
 
     def gettax_line_params(unit_cancels:, taxed_at:)
-      unit_cancels.map do |unit_cancel|
+      unit_cancels.sort_by(&:id).map do |unit_cancel|
         inventory_unit = unit_cancel.inventory_unit
 
         adjustment = unit_cancel.adjustment
