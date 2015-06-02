@@ -2,7 +2,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_avatax'
-  s.version     = '2.2.2'
+  s.version     = '2.2.3'
   s.summary     = 'Avatax extension for Spree 2.2.x'
   s.description = "Spree 2.2.x extension to retrieve tax rates via Avalara's SOAP API."
   s.required_ruby_version = '>= 1.9.3'

@@ -20,13 +20,13 @@ Known Issues
 ------------
 
 1. "Additional tax" (e.g. US taxes) *is* supported but "included tax" (e.g. VAT) is *not*.  This feature is not on the roadmap but we'd be willing to look at pull requests for it.
-2. Returns/Refunds/Exchanges are not currently being sent to Avatax.  This is on the todo list and will be worked during or soon after the returns & exchanges refactor that we're working on with Spree for Spree 2.4.
-3. Note for future development: There is currently a bug in Spree where the "open all adjustments" admin button doesn't work for line item adjustments. See [here](https://github.com/spree/spree/blob/v2.2.2/backend/app/controllers/spree/admin/orders_controller.rb#L103). If that bug were ever fixed, we'd want to monkey patch the controller action to prevent tax adjustments from ever being re-opened. We always want tax adjustments to be "closed", which tells Spree not to try to recalculate them automatically.
+2. Note for future development: There is currently a bug in Spree where the "open all adjustments" admin button doesn't work for line item adjustments. See [here](https://github.com/spree/spree/blob/v2.2.2/backend/app/controllers/spree/admin/orders_controller.rb#L103). If that bug were ever fixed, we'd want to monkey patch the controller action to prevent tax adjustments from ever being re-opened. We always want tax adjustments to be "closed", which tells Spree not to try to recalculate them automatically.
 
 Admin Configuration
 -------------------
 
-Once Avatax is configured, you should be able to select Avatax as a calculator for all tax rules. This can be done in the Spree Admin, http://localhost:3000/admin/tax_rates/ and editing each existing rule.
+1. Once Avatax is configured, you should be able to select Avatax as a calculator for all tax rules. This can be done in the Spree Admin, http://localhost:3000/admin/tax_rates/ and editing each existing rule.
+2. Tax categories should be setup in spree with the tax 'code' related to the Avalara tax codes since these are sent up with each line item in the requests.
 
 Testing
 -------

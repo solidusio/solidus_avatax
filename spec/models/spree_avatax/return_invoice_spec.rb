@@ -36,6 +36,7 @@ describe SpreeAvatax::ReturnInvoice do
           {
             no:                  return_item.id,
             itemcode:            return_item.inventory_unit.line_item.variant.sku,
+            taxcode:             return_item.inventory_unit.line_item.tax_category.code,
             qty:                 1,
             amount:              -return_item.pre_tax_amount,
             origincodeline:      SpreeAvatax::ReturnInvoice::DESTINATION_CODE,

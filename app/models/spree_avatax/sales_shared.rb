@@ -194,6 +194,7 @@ module SpreeAvatax::SalesShared
 
           # Optional Parameters
           itemcode:   line_item.variant.sku,
+          taxcode:    line_item.tax_category.code,
           # "discounted" tells avatax to include this item when it distributes order-level discounts
           # across avatax "lines"
           discounted: true,
