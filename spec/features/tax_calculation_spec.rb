@@ -78,7 +78,7 @@ describe "Tax Calculation" do
     @avalara_config = YAML.load_file("spec/avalara_config.yml")
     SpreeAvatax::Config.password = @avalara_config['password']
     SpreeAvatax::Config.username = @avalara_config['username']
-    SpreeAvatax::Config.use_production_account = false
+    SpreeAvatax::Config.service_url = @avalara_config['service_url']
     SpreeAvatax::Config.company_code = 'Bonobos'
   rescue => e
     skip("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
