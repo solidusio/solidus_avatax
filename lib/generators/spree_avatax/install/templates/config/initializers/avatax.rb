@@ -2,7 +2,11 @@
 SpreeAvatax::Config.username = 'your avatax username'
 SpreeAvatax::Config.password = 'your avatax password'
 SpreeAvatax::Config.company_code = 'your avatax company code'
-SpreeAvatax::Config.use_production_account = Rails.env.production?
+if Rails.env.production?
+  SpreeAvatax::Config.service_url = "https://avatax.avalara.net"
+else
+  SpreeAvatax::Config.service_url = "https://development.avalara.net"
+end
 
 # Use Avatax to compute return invoice tax amounts
 Spree::Reimbursement.reimbursement_tax_calculator = lambda do |reimbursement|

@@ -189,7 +189,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
       @tax_svc ||= AvaTax::TaxService.new({
         username:               SpreeAvatax::Config.username,
         password:               SpreeAvatax::Config.password,
-        use_production_account: SpreeAvatax::Config.use_production_account,
+        service_url:            SpreeAvatax::Config.service_url,
         clientname:             'Spree::Avatax',
       })
     end

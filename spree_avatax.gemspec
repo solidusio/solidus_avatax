@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'spree_core',  '~> 2.2.2'
   s.add_dependency 'hashie',      '~> 2.l.5'
   s.add_dependency 'multi_json'
-  s.add_dependency 'Avatax_TaxService', '~> 1.0.14'
+  s.add_dependency 'Avatax_TaxService', '~> 2.0.0'
   s.add_dependency 'newrelic_rpm', '~> 3.11'
 
   s.add_development_dependency 'rails',   '~>4.0.3'
