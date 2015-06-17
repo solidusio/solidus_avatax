@@ -9,7 +9,7 @@ class CreateSpreeAvataxReturnInvoices < ActiveRecord::Migration
       t.decimal :pre_tax_total, precision: 10, scale: 2
       t.decimal :additional_tax_total, precision: 10, scale: 2
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :spree_avatax_return_invoices, :reimbursement_id, unique: true
