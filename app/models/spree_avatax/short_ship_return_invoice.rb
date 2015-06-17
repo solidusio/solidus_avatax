@@ -111,7 +111,7 @@ class SpreeAvatax::ShortShipReturnInvoice < ActiveRecord::Base
           # Required Parameters
           no:                  inventory_unit.id,
           itemcode:            inventory_unit.line_item.variant.sku,
-          taxcode:             inventory_unit.line_item.tax_category.code,
+          taxcode:             inventory_unit.line_item.tax_category.tax_code,
           qty:                 1,
           amount:              -before_tax,
           origincodeline:      DESTINATION_CODE, # We don't really send the correct value here

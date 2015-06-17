@@ -84,7 +84,7 @@ describe SpreeAvatax::ShortShipReturnInvoice do
             {
               no:                  inventory_unit_1.id,
               itemcode:            inventory_unit_1.line_item.variant.sku,
-              taxcode:             inventory_unit_1.line_item.tax_category.code,
+              taxcode:             inventory_unit_1.line_item.tax_category.tax_code,
               qty:                 1,
               amount:              -10.to_d,
               origincodeline:      SpreeAvatax::ShortShipReturnInvoice::DESTINATION_CODE,
@@ -100,7 +100,7 @@ describe SpreeAvatax::ShortShipReturnInvoice do
             {
               no:                  inventory_unit_2.id,
               itemcode:            inventory_unit_2.line_item.variant.sku,
-              taxcode:             inventory_unit_2.line_item.tax_category.code,
+              taxcode:             inventory_unit_2.line_item.tax_category.tax_code,
               qty:                 1,
               amount:              -10.to_d,
               origincodeline:      SpreeAvatax::ShortShipReturnInvoice::DESTINATION_CODE,
