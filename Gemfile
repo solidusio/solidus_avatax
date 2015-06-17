@@ -1,19 +1,13 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-gem 'vcr'
-gem 'webmock'
-gem 'pry'
-gem 'timecop'
+gem "solidus", git: "git@github.com:solidusio/solidus.git", branch: "master"
+
+group :development, :test do
+  gem "pry-rails"
+  gem 'vcr'
+  gem 'webmock'
+  gem 'timecop'
+end
 
 gemspec
 
-gem 'spree', git: 'git@github.com:bonobos/spree.git', branch: '2-2-dev'
-
-group :test, :development do
-  platforms :ruby_19 do
-    gem 'pry-debugger'
-  end
-  platforms :ruby_20, :ruby_21 do
-    gem 'pry-byebug'
-  end
-end
