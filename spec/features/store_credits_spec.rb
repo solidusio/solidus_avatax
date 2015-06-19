@@ -56,21 +56,21 @@ RSpec.describe "Taxes with Store Credits" do
       end
       click_on "Save and Continue"
 
-      # Delivery
-      click_on "Save and Continue"
     end
 
     it "adjusts the credits to cover taxes" do
+      # Use a cassette so that we don't hit the Avatax API all of the time.
+      VCR.use_cassette("taxes_with_store_credits") do
+        click_on "Save and Continue"
+      end
+
       # Enter credit card details. Won't let us continue without it.
       fill_in "Name on card", with: "Han Solo"
       fill_in "Card Number", with: "4111111111111111"
       fill_in "card_expiry", with: "04 / 20"
       fill_in "Card Code", with: "123"
 
-      # Use a cassette so that we don't hit the Avatax API all of the time.
-      VCR.use_cassette("taxes_with_store_credits") do
-        click_button "Save and Continue"
-      end
+      click_button "Save and Continue"
 
       # Should have $1.60 in tax.
       within("#tax-adjustments") do

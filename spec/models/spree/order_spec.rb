@@ -56,11 +56,9 @@ describe Spree::Order do
     end
   end
 
-  context "when transitioning to confirm" do
+  context "when transitioning to payment" do
     before do
-      subject.update_attributes!(state: 'payment')
-      subject.payments.create!(state: 'checkout')
-      subject.stub(confirmation_required?: true)
+      subject.update_attributes!(state: 'delivery')
     end
 
     it "generates the sales invoice" do
