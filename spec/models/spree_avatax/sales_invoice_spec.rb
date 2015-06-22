@@ -60,7 +60,7 @@ describe SpreeAvatax::SalesInvoice do
             description: expected_truncated_description,
 
             itemcode:   line_item.variant.sku,
-            taxcode:    line_item.tax_category.code,
+            taxcode:    line_item.tax_category.tax_code,
             discounted: true,
           },
           { # shipping charge

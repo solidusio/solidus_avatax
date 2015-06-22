@@ -6,7 +6,7 @@ class CreateSpreeAvataxShortShipReturnInvoices < ActiveRecord::Migration
       t.string  :doc_code, null: false
       t.date    :doc_date, null: false
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :spree_avatax_short_ship_return_invoice_inventory_units do |t|

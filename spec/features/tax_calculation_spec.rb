@@ -46,14 +46,8 @@ describe "Tax Calculation" do
 
     let(:line_item_promotion) do
       FactoryGirl.create(
-        :promotion_with_item_adjustment,
-        code: 'line_item_promotion',
-        promotion_rules: [
-          Spree::Promotion::Rules::Product.new(
-            preferred_match_policy: 'any',
-            product_ids_string: order.line_items.first.product.id.to_s,
-          ),
-        ],
+        :promotion_with_item_total_rule,
+        code: 'line_item_promotion'
       )
     end
 

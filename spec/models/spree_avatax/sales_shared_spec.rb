@@ -42,34 +42,5 @@ describe SpreeAvatax::SalesShared do
       subject
       expect(line_item.adjustments.tax.count).to eq 0
     end
-
-    it 'should remove tax adjustments even if they are not reachable through a line item anymore' do
-      disassociated_adjustment = order.adjustments.eligible.tax.additional.create!({
-        adjustable: order.line_items.first,
-        amount: 6.66,
-        order: order,
-        label: 'Test',
-        included: false
-      })
-      disassociated_adjustment.update_columns(adjustable_id: nil)
-      subject
-      # make sure this got deleted
-      expect { disassociated_adjustment.reload }.to raise_error(ActiveRecord::RecordNotFound)
-    end
-
-    [:additional_tax_total, :adjustment_total, :included_tax_total].each do |f|
-      it "sets order #{f} to zero" do
-        subject
-        expect(order.send(f)).to eq 0
-      end
-    end
-
-    [:additional_tax_total, :adjustment_total, :pre_tax_amount, :included_tax_total].each do |f|
-      it "sets line_item #{f} to zero" do
-        subject
-        expect(order.line_items.sum(f)).to eq 0
-      end
-    end
   end
-
 end

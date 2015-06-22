@@ -1,8 +1,3 @@
-#
-# Adding this to your spec_helper will load these Factories for use:
-#   require 'spree_avatax/factories'
-#
-
 FactoryGirl.define do
   sequence(:doc_id) { |n| n.to_s.rjust(16, '0') }
 

@@ -1,7 +1,4 @@
-require 'new_relic/agent/method_tracer'
-
 module SpreeAvatax::SalesShared
-  extend ::NewRelic::Agent::MethodTracer
 
   DESTINATION_CODE = "1"
 
@@ -101,41 +98,29 @@ module SpreeAvatax::SalesShared
     def reset_tax_attributes(order)
       return if order.completed?
 
-      destroyed_adjustments = bench('reset_tax', 'adjustments') do
-        order.all_adjustments.tax.destroy_all
-      end
-
+      destroyed_adjustments = order.all_adjustments.tax.destroy_all
       return if destroyed_adjustments.empty?
 
-      bench('reset_tax', 'line_items') do
-        order.line_items.each do |line_item|
-          line_item.update_attributes!({
-            additional_tax_total: 0,
-            adjustment_total: 0,
-            pre_tax_amount: 0,
-            included_tax_total: 0,
-          })
-
-          Spree::ItemAdjustments.new(line_item).update
-          line_item.save!
-        end
-      end
-
-      bench('reset_tax', 'order') do
-        order.update_attributes!({
+      order.line_items.each do |line_item|
+        line_item.update_attributes!({
           additional_tax_total: 0,
           adjustment_total: 0,
+          pre_tax_amount: 0,
           included_tax_total: 0,
         })
+
+        Spree::ItemAdjustments.new(line_item).update
+        line_item.save!
       end
 
-      bench('reset_tax', 'updater') do
-        Spree::OrderUpdater.new(order).update
-      end
+      order.update_attributes!({
+        additional_tax_total: 0,
+        adjustment_total: 0,
+        included_tax_total: 0,
+      })
 
-      bench('reset_tax', 'save') do
-        order.save!
-      end
+      order.update!
+      order.save!
     end
 
     private
@@ -194,7 +179,7 @@ module SpreeAvatax::SalesShared
 
           # Optional Parameters
           itemcode:   line_item.variant.sku,
-          taxcode:    line_item.tax_category.code,
+          taxcode:    line_item.tax_category.tax_code,
           # "discounted" tells avatax to include this item when it distributes order-level discounts
           # across avatax "lines"
           discounted: true,
@@ -222,17 +207,5 @@ module SpreeAvatax::SalesShared
 
       line_item_lines + shipment_lines
     end
-
-    def bench(method, metric)
-      result, duration = nil
-      SpreeAvatax::SalesShared.trace_execution_scoped(["Custom/#{method}/#{metric}"]) do
-        duration = Benchmark.ms do
-          result = yield
-        end
-      end
-      Rails.logger.info "#{method}_#{metric}_ms=#{duration.round}"
-      result
-    end
-
   end
 end
