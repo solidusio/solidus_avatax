@@ -20,7 +20,7 @@ describe SpreeAvatax::Shared do
     end
 
     context 'when the order has no ship address' do
-      let(:order) { create(:shipped_order, line_items_count: 1, ship_address: nil) }
+      let(:order) { create(:order_with_totals, ship_address: nil) }
       it { should be false }
     end
   end
