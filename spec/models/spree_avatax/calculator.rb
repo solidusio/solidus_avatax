@@ -11,9 +11,9 @@ describe SpreeAvatax::Calculator do
 
   describe '#compute' do
     it 'should raise DoNotUseCompute' do
-      lambda {
+      expect {
         calculator.compute(nil)
-      }.should raise_error(SpreeAvatax::Calculator::DoNotUseCompute)
+      }.to raise_error(SpreeAvatax::Calculator::DoNotUseCompute)
     end
   end
 

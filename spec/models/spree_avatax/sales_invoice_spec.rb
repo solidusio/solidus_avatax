@@ -94,8 +94,8 @@ describe SpreeAvatax::SalesInvoice do
     end
 
     let!(:gettax_stub) do
-      SpreeAvatax::Shared.tax_svc
-        .should_receive(:gettax)
+      expect(SpreeAvatax::Shared.tax_svc)
+        .to receive(:gettax)
         .with(expected_gettax_params)
         .and_return(gettax_response)
     end
@@ -183,8 +183,8 @@ describe SpreeAvatax::SalesInvoice do
       let!(:gettax_stub) { }
 
       before do
-        SpreeAvatax::SalesShared
-          .should_receive(:get_tax)
+        expect(SpreeAvatax::SalesShared)
+          .to receive(:get_tax)
           .and_raise(error)
       end
 
@@ -201,7 +201,7 @@ describe SpreeAvatax::SalesInvoice do
         let(:new_error) { StandardError.new('just testing 2') }
 
         before do
-          SpreeAvatax::Config.stub(sales_invoice_generate_error_handler: handler)
+          allow(SpreeAvatax::Config).to receive_messages(sales_invoice_generate_error_handler: handler)
         end
 
         it 'calls the handler instead of raising the original error' do
@@ -271,7 +271,7 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       it 'does not call avatax' do
-        SpreeAvatax::Shared.tax_svc.should_receive(:gettax).never
+        expect(SpreeAvatax::Shared.tax_svc).to receive(:gettax).never
         subject
       end
     end
@@ -289,7 +289,7 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       it 'does not call avatax' do
-        SpreeAvatax::Shared.tax_svc.should_receive(:gettax).never
+        expect(SpreeAvatax::Shared.tax_svc).to receive(:gettax).never
         subject
       end
     end
@@ -320,8 +320,8 @@ describe SpreeAvatax::SalesInvoice do
 
     context 'when the order is taxable' do
       let!(:posttax_stub) do
-        SpreeAvatax::Shared.tax_svc
-          .should_receive(:posttax)
+        expect(SpreeAvatax::Shared.tax_svc)
+          .to receive(:posttax)
           .with(expected_posttax_params)
           .and_return(
             sales_invoice_posttax_response
@@ -337,11 +337,11 @@ describe SpreeAvatax::SalesInvoice do
 
     context 'when the order is not taxable' do
       before do
-        SpreeAvatax::Shared.should_receive(:taxable_order?).with(sales_invoice.order).and_return(false)
+        expect(SpreeAvatax::Shared).to receive(:taxable_order?).with(sales_invoice.order).and_return(false)
       end
 
       it 'does not call avatax' do
-        SpreeAvatax::Shared.tax_svc.should_receive(:posttax).never
+        expect(SpreeAvatax::Shared.tax_svc).to receive(:posttax).never
         subject
       end
     end
@@ -362,8 +362,8 @@ describe SpreeAvatax::SalesInvoice do
       let!(:posttax_stub) { }
 
       before do
-        SpreeAvatax::SalesInvoice
-          .should_receive(:post_tax)
+        expect(SpreeAvatax::SalesInvoice)
+          .to receive(:post_tax)
           .and_raise(error)
       end
 
@@ -380,7 +380,7 @@ describe SpreeAvatax::SalesInvoice do
         let(:new_error) { StandardError.new('just testing 2') }
 
         before do
-          SpreeAvatax::Config.stub(sales_invoice_commit_error_handler: handler)
+          allow(SpreeAvatax::Config).to receive_messages(sales_invoice_commit_error_handler: handler)
         end
 
         it 'calls the handler instead of raising the original error' do
@@ -413,8 +413,8 @@ describe SpreeAvatax::SalesInvoice do
       let(:canceltax_response) { sales_invoice_canceltax_response }
 
       let!(:canceltax_stub) do
-        SpreeAvatax::Shared.tax_svc
-          .should_receive(:canceltax)
+        expect(SpreeAvatax::Shared.tax_svc)
+          .to receive(:canceltax)
           .with(expected_canceltax_params)
           .and_return(canceltax_response)
       end
@@ -431,8 +431,8 @@ describe SpreeAvatax::SalesInvoice do
         let!(:canceltax_stub) { }
 
         before do
-          SpreeAvatax::SalesInvoice
-            .should_receive(:cancel_tax)
+          expect(SpreeAvatax::SalesInvoice)
+            .to receive(:cancel_tax)
             .and_raise(error)
         end
 
@@ -449,7 +449,7 @@ describe SpreeAvatax::SalesInvoice do
           let(:new_error) { StandardError.new('just testing 2') }
 
           before do
-            SpreeAvatax::Config.stub(sales_invoice_cancel_error_handler: handler)
+            allow(SpreeAvatax::Config).to receive_messages(sales_invoice_cancel_error_handler: handler)
           end
 
           it 'calls the handler instead of raising the original error' do

@@ -24,17 +24,17 @@ describe Spree::TaxRate do
 
   describe '#adjust' do
     it 'raises TaxRateInvalidOperation' do
-      lambda {
+      expect {
         tax_rate.adjust(nil, nil)
-      }.should raise_error(SpreeAvatax::TaxRateInvalidOperation)
+      }.to raise_error(SpreeAvatax::TaxRateInvalidOperation)
     end
   end
 
   describe '#compute_amount' do
     it 'raises TaxRateInvalidOperation' do
-      lambda {
+      expect {
         tax_rate.compute_amount(nil)
-      }.should raise_error(SpreeAvatax::TaxRateInvalidOperation)
+      }.to raise_error(SpreeAvatax::TaxRateInvalidOperation)
     end
   end
 end
