@@ -1,0 +1,136 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://development.avalara.net/Tax/TaxSvc.asmx
+    body:
+      encoding: UTF-8
+      string: "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"
+        xmlns:ser=\"http://avatax.avalara.com/services\">\n   <soapenv:Header>\n      <wsse:Security
+        xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\n
+        \        <wsse:UsernameToken wsu:Id=\"UsernameToken-7\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n
+        \           <wsse:Username>[Username]</wsse:Username>\n            <wsse:Password
+        Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">[Password]</wsse:Password>\n
+        \           <wsu:Created>2012-03-02T23:41:44.511Z</wsu:Created>\n         </wsse:UsernameToken>\n
+        \     </wsse:Security>\n      <ser:Profile>\n         <ser:Name></ser:Name>\n
+        \        <ser:Client>Spree::Avatax</ser:Client>\n         <ser:Adapter>Avatax
+        SDK for Ruby2.0.2</ser:Adapter>\n         <ser:Machine></ser:Machine>\n      </ser:Profile>\n
+        \  </soapenv:Header>\n      <soapenv:Body>\n        <ser:GetTax>\n         <ser:GetTaxRequest>\n
+        \          <ser:CompanyCode>[Company]</ser:CompanyCode>\n           <ser:DocType>SalesInvoice</ser:DocType>\n
+        \          <ser:DocCode>R383509579</ser:DocCode>\n           <ser:DocDate>2015-07-24</ser:DocDate>\n
+        \          <ser:SalespersonCode></ser:SalespersonCode>\n           <ser:CustomerCode>clovis@runolfsdottirvon.com</ser:CustomerCode>\n
+        \          <ser:CustomerUsageType></ser:CustomerUsageType>\n           <ser:Discount>-0.0</ser:Discount>\n
+        \          <ser:PurchaseOrderNo></ser:PurchaseOrderNo>\n           <ser:ExemptionNo></ser:ExemptionNo>\n
+        \          <ser:OriginCode></ser:OriginCode>\n           <ser:DestinationCode></ser:DestinationCode>\n
+        \          <ser:Addresses>\n           <ser:BaseAddress>\n             <ser:AddressCode>1</ser:AddressCode>\n
+        \            <ser:Line1>35 Crosby St</ser:Line1>\n             <ser:Line2>Northwest</ser:Line2>\n
+        \            <ser:Line3></ser:Line3>\n             <ser:City>New York</ser:City>\n
+        \            <ser:Region></ser:Region>\n             <ser:PostalCode>10013</ser:PostalCode>\n
+        \            <ser:Country></ser:Country>\n             <ser:TaxRegionId>0</ser:TaxRegionId>\n
+        \            <ser:Latitude></ser:Latitude>\n             <ser:Longitude></ser:Longitude>\n
+        \          </ser:BaseAddress>   \n           </ser:Addresses>\n           <ser:Lines>\n
+        \          <ser:Line>\n             <ser:No>Spree::LineItem-1</ser:No>\n             <ser:OriginCode>1</ser:OriginCode>\n
+        \            <ser:DestinationCode>1</ser:DestinationCode>\n             <ser:ItemCode>SKU-28</ser:ItemCode>\n
+        \            <ser:TaxCode>TaxCode - 843504</ser:TaxCode>\n             <ser:Qty>1</ser:Qty>\n
+        \            <ser:Amount>10.0</ser:Amount>\n             <ser:Discounted>true</ser:Discounted>\n
+        \            <ser:RevAcct></ser:RevAcct>\n             <ser:Ref1></ser:Ref1>
+        \                 \n             <ser:Ref2></ser:Ref2>\n             <ser:ExemptionNo></ser:ExemptionNo>\n
+        \            <ser:CustomerUsageType></ser:CustomerUsageType>\n             <ser:Description>Natus
+        amet eius eum excepturi rerum molestias. Et sunt autem laborum eum reprehenderit
+        aperiam re...</ser:Description>\n             <ser:TaxOverride>\n               <ser:TaxOverrideType>None</ser:TaxOverrideType>\n
+        \              <ser:TaxAmount>0</ser:TaxAmount>\n               <ser:TaxDate>1900-01-01</ser:TaxDate>\n
+        \              <ser:Reason></ser:Reason>\n             </ser:TaxOverride>\n
+        \            <ser:TaxIncluded>false</ser:TaxIncluded>\n             <ser:BusinessIdentificationNo></ser:BusinessIdentificationNo>\n
+        \          </ser:Line>\n           <ser:Line>\n             <ser:No>Spree::LineItem-2</ser:No>\n
+        \            <ser:OriginCode>1</ser:OriginCode>\n             <ser:DestinationCode>1</ser:DestinationCode>\n
+        \            <ser:ItemCode>SKU-29</ser:ItemCode>\n             <ser:TaxCode>TaxCode
+        - 843504</ser:TaxCode>\n             <ser:Qty>1</ser:Qty>\n             <ser:Amount>10.0</ser:Amount>\n
+        \            <ser:Discounted>true</ser:Discounted>\n             <ser:RevAcct></ser:RevAcct>\n
+        \            <ser:Ref1></ser:Ref1>                  \n             <ser:Ref2></ser:Ref2>\n
+        \            <ser:ExemptionNo></ser:ExemptionNo>\n             <ser:CustomerUsageType></ser:CustomerUsageType>\n
+        \            <ser:Description>Facere excepturi sapiente voluptates aut. Voluptatem
+        qui nam eius in fuga officiis illum cupidita...</ser:Description>\n             <ser:TaxOverride>\n
+        \              <ser:TaxOverrideType>None</ser:TaxOverrideType>\n               <ser:TaxAmount>0</ser:TaxAmount>\n
+        \              <ser:TaxDate>1900-01-01</ser:TaxDate>\n               <ser:Reason></ser:Reason>\n
+        \            </ser:TaxOverride>\n             <ser:TaxIncluded>false</ser:TaxIncluded>\n
+        \            <ser:BusinessIdentificationNo></ser:BusinessIdentificationNo>\n
+        \          </ser:Line>\n           <ser:Line>\n             <ser:No>Spree::Shipment-1</ser:No>\n
+        \            <ser:OriginCode>1</ser:OriginCode>\n             <ser:DestinationCode>1</ser:DestinationCode>\n
+        \            <ser:ItemCode></ser:ItemCode>\n             <ser:TaxCode>FR020100</ser:TaxCode>\n
+        \            <ser:Qty>1</ser:Qty>\n             <ser:Amount>100.0</ser:Amount>\n
+        \            <ser:Discounted>false</ser:Discounted>\n             <ser:RevAcct></ser:RevAcct>\n
+        \            <ser:Ref1></ser:Ref1>                  \n             <ser:Ref2></ser:Ref2>\n
+        \            <ser:ExemptionNo></ser:ExemptionNo>\n             <ser:CustomerUsageType></ser:CustomerUsageType>\n
+        \            <ser:Description>Shipping Charge</ser:Description>\n             <ser:TaxOverride>\n
+        \              <ser:TaxOverrideType>None</ser:TaxOverrideType>\n               <ser:TaxAmount>0</ser:TaxAmount>\n
+        \              <ser:TaxDate>1900-01-01</ser:TaxDate>\n               <ser:Reason></ser:Reason>\n
+        \            </ser:TaxOverride>\n             <ser:TaxIncluded>false</ser:TaxIncluded>\n
+        \            <ser:BusinessIdentificationNo></ser:BusinessIdentificationNo>\n
+        \          </ser:Line>  \n          </ser:Lines>\n          <ser:DetailLevel>Tax</ser:DetailLevel>\n
+        \         <ser:ReferenceCode></ser:ReferenceCode>\n          <ser:HashCode>0</ser:HashCode>\n
+        \         <ser:LocationCode></ser:LocationCode>\n          <ser:Commit>false</ser:Commit>\n
+        \         <ser:BatchCode></ser:BatchCode>\n          <ser:TaxOverride>\n            <ser:TaxOverrideType>None</ser:TaxOverrideType>\n
+        \           <ser:TaxAmount>0</ser:TaxAmount>\n            <ser:TaxDate>1900-01-01</ser:TaxDate>\n
+        \           <ser:Reason></ser:Reason>\n          </ser:TaxOverride>\n          <ser:CurrencyCode></ser:CurrencyCode>\n
+        \         <ser:ServiceMode>Remote</ser:ServiceMode>\n          <ser:PaymentDate>1900-01-01</ser:PaymentDate>\n
+        \         <ser:ExchangeRate>0</ser:ExchangeRate>\n          <ser:ExchangeRateEffDate>1900-01-01</ser:ExchangeRateEffDate>\n
+        \         <ser:PosLaneCode></ser:PosLaneCode>\n          <ser:BusinessIdentificationNo></ser:BusinessIdentificationNo>\n
+        \       </ser:GetTaxRequest>\n      </ser:GetTax>\n   </soapenv:Body>\n</soapenv:Envelope>"
+    headers:
+      Soapaction:
+      - '"http://avatax.avalara.com/services/GetTax"'
+      Content-Type:
+      - text/xml;charset=UTF-8
+      Content-Length:
+      - '6934'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/xml; charset=utf-8
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - ASP.NET
+      Date:
+      - Fri, 24 Jul 2015 22:56:42 GMT
+      Content-Length:
+      - '1747'
+      Set-Cookie:
+      - TS017f1821=01256c426e4190f29f505c865753c29bb1f26213cfd2ca13335061518362bc42dcdda7cd96;
+        Path=/
+      - TS017f1821_28=0167927a87b56f4c7f5271d248ccbdfd205026eeca5681ede04db87575971055083e96ce658d631799963f1cefbbceec9c01db7ff7;
+        Path=/
+    body:
+      encoding: UTF-8
+      string: <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetTaxResponse
+        xmlns="http://avatax.avalara.com/services"><GetTaxResult><TransactionId>1211170648</TransactionId><ResultCode>Success</ResultCode><DocId>102166988</DocId><DocType>SalesInvoice</DocType><DocCode>R383509579</DocCode><DocDate>2015-07-24</DocDate><DocStatus>Saved</DocStatus><Reconciled>false</Reconciled><Timestamp>2015-07-24T22:56:42.167</Timestamp><TotalAmount>120</TotalAmount><TotalDiscount>0</TotalDiscount><TotalExemption>0</TotalExemption><TotalTaxable>120</TotalTaxable><TotalTax>10.66</TotalTax><TotalTaxCalculated>10.66</TotalTaxCalculated><HashCode>0</HashCode><TaxLines><TaxLine><No>Spree::LineItem-1</No><TaxCode>P0000000</TaxCode><Taxability>true</Taxability><BoundaryLevel>Address</BoundaryLevel><Exemption>0</Exemption><Discount>0</Discount><Taxable>10</Taxable><Rate>0.088750</Rate><Tax>0.89</Tax><TaxCalculated>0.89</TaxCalculated><TaxIncluded>false</TaxIncluded><TaxDetails><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>State</JurisType><JurisCode>36</JurisCode><TaxType>Sales</TaxType><Base>10</Base><Taxable>10</Taxable><Rate>0.040000</Rate><Tax>0.4</Tax><TaxCalculated>0.4</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>NEW
+        YORK</JurisName><TaxName>NY STATE TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo/></TaxDetail><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>City</JurisType><JurisCode>51000</JurisCode><TaxType>Sales</TaxType><Base>10</Base><Taxable>10</Taxable><Rate>0.045000</Rate><Tax>0.45</Tax><TaxCalculated>0.45</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>NEW
+        YORK CITY</JurisName><TaxName>NY CITY TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo>NE
+        8081</StateAssignedNo></TaxDetail><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>Special</JurisType><JurisCode>359071</JurisCode><TaxType>Sales</TaxType><Base>10</Base><Taxable>10</Taxable><Rate>0.003750</Rate><Tax>0.04</Tax><TaxCalculated>0.04</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>METROPOLITAN
+        COMMUTER TRANSPORTATION DISTRICT</JurisName><TaxName>NY SPECIAL TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo>NE
+        8081</StateAssignedNo></TaxDetail></TaxDetails><ExemptCertId>0</ExemptCertId><TaxDate>2015-07-24</TaxDate><ReportingDate>2015-07-24</ReportingDate><AccountingMethod>Accrual</AccountingMethod></TaxLine><TaxLine><No>Spree::LineItem-2</No><TaxCode>P0000000</TaxCode><Taxability>true</Taxability><BoundaryLevel>Address</BoundaryLevel><Exemption>0</Exemption><Discount>0</Discount><Taxable>10</Taxable><Rate>0.088750</Rate><Tax>0.89</Tax><TaxCalculated>0.89</TaxCalculated><TaxIncluded>false</TaxIncluded><TaxDetails><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>State</JurisType><JurisCode>36</JurisCode><TaxType>Sales</TaxType><Base>10</Base><Taxable>10</Taxable><Rate>0.040000</Rate><Tax>0.4</Tax><TaxCalculated>0.4</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>NEW
+        YORK</JurisName><TaxName>NY STATE TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo/></TaxDetail><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>City</JurisType><JurisCode>51000</JurisCode><TaxType>Sales</TaxType><Base>10</Base><Taxable>10</Taxable><Rate>0.045000</Rate><Tax>0.45</Tax><TaxCalculated>0.45</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>NEW
+        YORK CITY</JurisName><TaxName>NY CITY TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo>NE
+        8081</StateAssignedNo></TaxDetail><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>Special</JurisType><JurisCode>359071</JurisCode><TaxType>Sales</TaxType><Base>10</Base><Taxable>10</Taxable><Rate>0.003750</Rate><Tax>0.04</Tax><TaxCalculated>0.04</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>METROPOLITAN
+        COMMUTER TRANSPORTATION DISTRICT</JurisName><TaxName>NY SPECIAL TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo>NE
+        8081</StateAssignedNo></TaxDetail></TaxDetails><ExemptCertId>0</ExemptCertId><TaxDate>2015-07-24</TaxDate><ReportingDate>2015-07-24</ReportingDate><AccountingMethod>Accrual</AccountingMethod></TaxLine><TaxLine><No>Spree::Shipment-1</No><TaxCode>FR020100</TaxCode><Taxability>true</Taxability><BoundaryLevel>Address</BoundaryLevel><Exemption>0</Exemption><Discount>0</Discount><Taxable>100</Taxable><Rate>0.088750</Rate><Tax>8.88</Tax><TaxCalculated>8.88</TaxCalculated><TaxIncluded>false</TaxIncluded><TaxDetails><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>State</JurisType><JurisCode>36</JurisCode><TaxType>Sales</TaxType><Base>100</Base><Taxable>100</Taxable><Rate>0.040000</Rate><Tax>4</Tax><TaxCalculated>4</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>NEW
+        YORK</JurisName><TaxName>NY STATE TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo/></TaxDetail><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>City</JurisType><JurisCode>51000</JurisCode><TaxType>Sales</TaxType><Base>100</Base><Taxable>100</Taxable><Rate>0.045000</Rate><Tax>4.5</Tax><TaxCalculated>4.5</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>NEW
+        YORK CITY</JurisName><TaxName>NY CITY TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo>NE
+        8081</StateAssignedNo></TaxDetail><TaxDetail><Country>US</Country><Region>NY</Region><JurisType>Special</JurisType><JurisCode>359071</JurisCode><TaxType>Sales</TaxType><Base>100</Base><Taxable>100</Taxable><Rate>0.003750</Rate><Tax>0.38</Tax><TaxCalculated>0.38</TaxCalculated><NonTaxable>0</NonTaxable><Exemption>0</Exemption><JurisName>METROPOLITAN
+        COMMUTER TRANSPORTATION DISTRICT</JurisName><TaxName>NY SPECIAL TAX</TaxName><TaxAuthorityType>45</TaxAuthorityType><TaxGroup/><RateType>G</RateType><StateAssignedNo>NE
+        8081</StateAssignedNo></TaxDetail></TaxDetails><ExemptCertId>0</ExemptCertId><TaxDate>2015-07-24</TaxDate><ReportingDate>2015-07-24</ReportingDate><AccountingMethod>Accrual</AccountingMethod></TaxLine></TaxLines><TaxAddresses><TaxAddress><Address>35
+        Crosby St</Address><AddressCode>1</AddressCode><BoundaryLevel>0</BoundaryLevel><City>New
+        York</City><Country>US</Country><PostalCode>10013</PostalCode><Region>NY</Region><TaxRegionId>2088629</TaxRegionId><JurisCode>3600051000</JurisCode><Latitude/><Longitude/><GeocodeType>StreetLevel</GeocodeType><ValidateStatus>NormalHit</ValidateStatus><DistanceToBoundary>0</DistanceToBoundary></TaxAddress></TaxAddresses><Locked>false</Locked><AdjustmentReason>0</AdjustmentReason><AdjustmentDescription/><Version>1</Version><TaxDate>2015-07-24</TaxDate><TaxSummary/><VolatileTaxRates>false</VolatileTaxRates></GetTaxResult></GetTaxResponse></s:Body></s:Envelope>
+    http_version:
+  recorded_at: Fri, 24 Jul 2015 22:56:54 GMT
+recorded_with: VCR 2.9.3

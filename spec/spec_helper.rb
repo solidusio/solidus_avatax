@@ -36,6 +36,9 @@ Dir[File.join(File.dirname(__FILE__), "support/**/*.rb")].each { |f| require f }
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
   c.hook_into :webmock
+  c.filter_sensitive_data("[Username]") { ENV["AVATAX_USERNAME"] }
+  c.filter_sensitive_data("[Password]") { ENV["AVATAX_PASSWORD"] }
+  c.filter_sensitive_data("[Company]") { ENV["AVATAX_COMPANY_CODE"] }
 end
 
 RSpec.configure do |config|

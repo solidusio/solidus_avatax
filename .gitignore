@@ -13,4 +13,3 @@ pkg
 *.swp
 spec/dummy
 spec/avalara_config.yml
-spec/fixtures/vcr_cassettes
