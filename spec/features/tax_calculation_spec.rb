@@ -7,7 +7,12 @@ describe "Tax Calculation" do
   let(:line_item_2) { order.line_items.last }
 
   before do
-    setup_configs
+    # Set up Avatax (just in case we don't have a cassette)
+    SpreeAvatax::Config.password = ENV["AVATAX_PASSWORD"]
+    SpreeAvatax::Config.username = ENV["AVATAX_USERNAME"]
+    SpreeAvatax::Config.service_url = "https://development.avalara.net"
+    SpreeAvatax::Config.company_code = ENV["AVATAX_COMPANY_CODE"]
+
     order.line_items.first.product.tax_category.tax_rates << Spree::TaxRate.first
   end
 
@@ -66,15 +71,5 @@ describe "Tax Calculation" do
         subject
       end.to change { order.line_items.first.reload.additional_tax_total }
     end
-  end
-
-  def setup_configs
-    @avalara_config = YAML.load_file("spec/avalara_config.yml")
-    SpreeAvatax::Config.password = @avalara_config['password']
-    SpreeAvatax::Config.username = @avalara_config['username']
-    SpreeAvatax::Config.service_url = @avalara_config['service_url']
-    SpreeAvatax::Config.company_code = 'Bonobos'
-  rescue => e
-    skip("PLEASE PROVIDE AVALARA CONFIGURATIONS TO RUN LIVE TESTS [#{e.to_s}]")
   end
 end

@@ -5,11 +5,10 @@ RSpec.describe "Taxes with Store Credits" do
 
   before do
     # Set up Avatax (just in case we don't have a cassette)
-    config = YAML.load_file("spec/avalara_config.yml")
-    SpreeAvatax::Config.password = config['password']
-    SpreeAvatax::Config.username = config['username']
-    SpreeAvatax::Config.service_url = config['service_url']
-    SpreeAvatax::Config.company_code = 'Bonobos'
+    SpreeAvatax::Config.password = ENV["AVATAX_PASSWORD"]
+    SpreeAvatax::Config.username = ENV["AVATAX_USERNAME"]
+    SpreeAvatax::Config.service_url = "https://development.avalara.net"
+    SpreeAvatax::Config.company_code = ENV["AVATAX_COMPANY_CODE"]
 
     # Set up a zone
     zone = FactoryGirl.create(:zone)

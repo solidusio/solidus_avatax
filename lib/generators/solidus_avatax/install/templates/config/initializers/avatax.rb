@@ -1,7 +1,7 @@
 # Avatax Setup
-SpreeAvatax::Config.username = 'your avatax username'
-SpreeAvatax::Config.password = 'your avatax password'
-SpreeAvatax::Config.company_code = 'your avatax company code'
+SpreeAvatax::Config.username = ENV["AVATAX_USERNAME"]
+SpreeAvatax::Config.password = ENV["AVATAX_PASSWORD"]
+SpreeAvatax::Config.company_code = ENV["AVATAX_COMPANY_CODE"]
 if Rails.env.production?
   SpreeAvatax::Config.service_url = "https://avatax.avalara.net"
 else

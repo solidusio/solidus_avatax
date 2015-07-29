@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SpreeAvatax::Shared do
   describe '.logger' do
     subject { SpreeAvatax::Shared.logger }
-    it { should be_a Logger }
+    it { is_expected.to be_a Logger }
   end
 
   describe '.taxable_order?' do
@@ -11,23 +11,23 @@ describe SpreeAvatax::Shared do
 
     context 'when the order is taxable' do
       let(:order) { create(:shipped_order, line_items_count: 1) }
-      it { should be true }
+      it { is_expected.to be true }
     end
 
     context 'when the order has no line items' do
       let(:order) { create(:order) }
-      it { should be false }
+      it { is_expected.to be false }
     end
 
     context 'when the order has no ship address' do
-      let(:order) { create(:shipped_order, line_items_count: 1, ship_address: nil) }
-      it { should be false }
+      let(:order) { create(:order_with_totals, ship_address: nil) }
+      it { is_expected.to be false }
     end
   end
 
   describe '.tax_svc' do
     subject { SpreeAvatax::Shared.tax_svc }
-    it { should be_a AvaTax::TaxService }
+    it { is_expected.to be_a AvaTax::TaxService }
   end
 
   describe '.require_success!' do
