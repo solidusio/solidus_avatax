@@ -7,7 +7,7 @@ Spree::Adjustment.class_eval do
         in: ['closed'],
         message: "Tax adjustments must always be closed for Avatax",
       },
-      if: 'source == "Spree::TaxRate"',
+      if: 'source_type == "Spree::TaxRate"',
     }
   )
 
