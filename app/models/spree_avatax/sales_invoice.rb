@@ -26,7 +26,7 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
       return if order.completed? || !SpreeAvatax::Shared.taxable_order?(order)
 
       order.line_items.each do |line_item|
-        line_item.update_column(:pre_tax_amount, line_item.discounted_amount)
+        line_item.update_column(:pre_tax_amount, line_item.discounted_amount.round(2))
       end
 
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
