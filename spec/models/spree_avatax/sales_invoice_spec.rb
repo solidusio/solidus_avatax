@@ -181,11 +181,38 @@ describe SpreeAvatax::SalesInvoice do
     context 'when an error occurs' do
       let(:error) { StandardError.new('just testing') }
       let!(:gettax_stub) { }
+      let(:order) do
+        create(:order_with_line_items,
+               line_items_count: 2,
+               ship_address: create(:address, {
+                 address1: "1234 Way",
+                 address2: "",
+                 city: "New York",
+                 state: state,
+                 country: country,
+                 zipcode: "10010",
+                 phone: "1111111111",
+               }))
+      end
 
       before do
         expect(SpreeAvatax::SalesShared)
           .to receive(:get_tax)
           .and_raise(error)
+
+        order.line_items.update_all(pre_tax_amount: nil)
+        order.reload
+      end
+
+      it 'sets the pre_tax_amount on each line item in the order' do
+        expect{ subject }.to raise_error(error)
+        expect(order.line_items.first.pre_tax_amount.to_f).to equal(order.line_items.first.discounted_amount.to_f)
+        expect(order.line_items.last.pre_tax_amount.to_f).to equal(order.line_items.last.discounted_amount.to_f)
+      end
+
+      it 'sets the pre_tax_amount on each shipment in the order' do
+        expect{ subject }.to raise_error(error)
+        expect(order.shipments.first.pre_tax_amount.to_f).to equal(order.shipments.first.discounted_amount.to_f)
       end
 
       context 'when an error_handler is not defined' do
