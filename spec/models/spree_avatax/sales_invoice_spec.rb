@@ -139,7 +139,7 @@ describe SpreeAvatax::SalesInvoice do
       adjustment = line_item.adjustments.first
       expect(adjustment.amount).to eq line_item_calculated_tax
       expect(adjustment.source).to eq Spree::TaxRate.first
-      expect(adjustment.state).to eq 'closed'
+      expect(adjustment.finalized).to eq true
     end
 
     it "creates a shipment adjustment" do
@@ -148,7 +148,7 @@ describe SpreeAvatax::SalesInvoice do
       adjustment = shipment.adjustments.first
       expect(adjustment.amount).to eq shipment_calculated_tax
       expect(adjustment.source).to eq Spree::TaxRate.first
-      expect(adjustment.state).to eq 'closed'
+      expect(adjustment.finalized).to eq true
     end
 
     context 'user input contains XML characters' do

@@ -17,7 +17,7 @@ describe SpreeAvatax::SalesShared do
         order: order,
         label: 'Previous Tax',
         included: false,
-        state: 'closed',
+        finalized: true,
       })
 
       line_item.update_attributes!({

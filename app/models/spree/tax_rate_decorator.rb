@@ -31,7 +31,7 @@ Spree::TaxRate.class_eval do
   end
 
   def compute_amount(item)
-    # Avatax tax adjustments should always be in a closed state so Spree should never attempt to call this code
+    # Avatax tax adjustments should always be finalized so Spree should never attempt to call this code
     raise SpreeAvatax::TaxRateInvalidOperation.new("Spree::TaxRate#compute_amount should never be called when Avatax is present")
   end
 

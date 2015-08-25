@@ -41,10 +41,11 @@ describe SpreeAvatax::ShortShipReturnInvoice do
         label: 'fake tax',
         order: order,
         source: Spree::TaxRate.avatax_the_one_rate,
-        state: 'closed',
+        finalized: true,
       )
       order.contents.advance
       create(:payment, amount: order.total, order: order)
+      order.contents.advance
       order.complete!
       order.reload
     end
