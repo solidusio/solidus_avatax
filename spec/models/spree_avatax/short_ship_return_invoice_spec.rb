@@ -45,6 +45,7 @@ describe SpreeAvatax::ShortShipReturnInvoice do
       )
       order.contents.advance
       create(:payment, amount: order.total, order: order)
+      order.contents.advance
       order.complete!
       order.reload
     end
