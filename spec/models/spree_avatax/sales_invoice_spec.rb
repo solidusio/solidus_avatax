@@ -200,7 +200,7 @@ describe SpreeAvatax::SalesInvoice do
           .to receive(:get_tax)
           .and_raise(error)
 
-        order.line_items.update_all(pre_tax_amount: nil)
+        order.line_items.update_all(pre_tax_amount: 0)
         order.reload
       end
 
