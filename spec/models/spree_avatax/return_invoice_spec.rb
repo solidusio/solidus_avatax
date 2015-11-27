@@ -56,7 +56,7 @@ describe SpreeAvatax::ReturnInvoice do
       BigDecimal.new(gettax_response_return_item_tax_line[:tax]).abs
     end
 
-    before do
+    let!(:tax_svc_expectation) do
       expect(SpreeAvatax::Shared.tax_svc)
         .to receive(:gettax)
         .with(expected_gettax_params)
@@ -150,6 +150,17 @@ describe SpreeAvatax::ReturnInvoice do
         subject
       end
     end
+
+    context 'when avatax is disabled' do
+      let!(:config) { create(:avatax_config, enabled: false) }
+      let!(:tax_svc_expectation) { expect(SpreeAvatax::Shared).to_not receive(:tax_svc) }
+
+      it 'does nothing' do
+        expect {
+          subject
+        }.to_not change { SpreeAvatax::ReturnInvoice.count }
+      end
+    end
   end
 
   describe '.finalize' do
@@ -170,7 +181,7 @@ describe SpreeAvatax::ReturnInvoice do
       }
     end
 
-    before do
+    let!(:tax_svc_expectation) do
       expect(SpreeAvatax::Shared.tax_svc)
         .to receive(:posttax)
         .with(expected_posttax_params)
@@ -187,6 +198,16 @@ describe SpreeAvatax::ReturnInvoice do
       expect {
         subject
       }.to change { return_invoice.reload.committed? }.from(false).to(true)
+    end
+
+    context 'when avatax is disabled' do
+      let!(:config) { create(:avatax_config, enabled: false) }
+      let!(:tax_svc_expectation) { expect(SpreeAvatax::Shared).to_not receive(:tax_svc) }
+
+      it 'does nothing' do
+        subject
+        expect(return_invoice.reload.committed?).to be_falsey
+      end
     end
   end
 

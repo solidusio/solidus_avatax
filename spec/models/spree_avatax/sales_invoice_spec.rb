@@ -93,7 +93,7 @@ describe SpreeAvatax::SalesInvoice do
       BigDecimal.new(gettax_response_shipment_tax_line[:tax]).abs
     end
 
-    let!(:gettax_stub) do
+    let!(:tax_svc_expectation) do
       expect(SpreeAvatax::Shared.tax_svc)
         .to receive(:gettax)
         .with(expected_gettax_params)
@@ -180,7 +180,7 @@ describe SpreeAvatax::SalesInvoice do
 
     context 'when an error occurs' do
       let(:error) { StandardError.new('just testing') }
-      let!(:gettax_stub) { }
+      let!(:tax_svc_expectation) { }
       let(:order) do
         create(:order_with_line_items,
                line_items_count: 2,
@@ -288,7 +288,7 @@ describe SpreeAvatax::SalesInvoice do
     context 'when the order is not taxable' do
       let(:order) { create(:order_with_line_items, ship_address: nil, line_items_count: 1) }
 
-      let!(:gettax_stub) { }
+      let!(:tax_svc_expectation) { }
 
       it 'does not create a sales invoice' do
         expect {
@@ -306,7 +306,7 @@ describe SpreeAvatax::SalesInvoice do
     context 'when the order is already completed' do
       let(:order) { create(:completed_order_with_totals) }
 
-      let!(:gettax_stub) { }
+      let!(:tax_svc_expectation) { }
 
       it 'does not create a sales invoice' do
         expect {
@@ -318,6 +318,17 @@ describe SpreeAvatax::SalesInvoice do
       it 'does not call avatax' do
         expect(SpreeAvatax::Shared.tax_svc).to receive(:gettax).never
         subject
+      end
+    end
+
+    context 'when avatax is disabled' do
+      let!(:config) { create(:avatax_config, enabled: false) }
+      let!(:tax_svc_expectation) { expect(SpreeAvatax::Shared).to_not receive(:tax_svc) }
+
+      it 'does nothing' do
+        expect {
+          subject
+        }.to_not change { SpreeAvatax::SalesInvoice.count }
       end
     end
   end
@@ -417,6 +428,16 @@ describe SpreeAvatax::SalesInvoice do
         end
       end
     end
+
+    context 'when avatax is disabled' do
+      let!(:config) { create(:avatax_config, enabled: false) }
+      let!(:tax_svc_expectation) { expect(SpreeAvatax::Shared).to_not receive(:tax_svc) }
+
+      it 'does nothing' do
+        subject
+        expect(sales_invoice.reload.committed_at?).to be_falsey
+      end
+    end
   end
 
   describe '.cancel' do
@@ -439,7 +460,7 @@ describe SpreeAvatax::SalesInvoice do
 
       let(:canceltax_response) { sales_invoice_canceltax_response }
 
-      let!(:canceltax_stub) do
+      let!(:tax_svc_expectation) do
         expect(SpreeAvatax::Shared.tax_svc)
           .to receive(:canceltax)
           .with(expected_canceltax_params)
@@ -455,7 +476,7 @@ describe SpreeAvatax::SalesInvoice do
 
       context 'when an error occurs' do
         let(:error) { StandardError.new('just testing') }
-        let!(:canceltax_stub) { }
+        let!(:tax_svc_expectation) { }
 
         before do
           expect(SpreeAvatax::SalesInvoice)
@@ -484,6 +505,16 @@ describe SpreeAvatax::SalesInvoice do
               subject
             }.to raise_error(new_error)
           end
+        end
+      end
+
+      context 'when avatax is disabled' do
+        let!(:config) { create(:avatax_config, enabled: false) }
+        let!(:tax_svc_expectation) { expect(SpreeAvatax::Shared).to_not receive(:tax_svc) }
+
+        it 'does nothing' do
+          subject
+          expect(sales_invoice.canceled_at?).to be_falsey
         end
       end
     end

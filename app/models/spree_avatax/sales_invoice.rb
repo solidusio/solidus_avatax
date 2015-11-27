@@ -23,6 +23,11 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     def generate(order)
       bench_start = Time.now
 
+      if !SpreeAvatax::Config.enabled
+        logger.info("Avatax disabled. Skipping SalesInvoice.generate for order #{order.number}")
+        return
+      end
+
       return if order.completed? || !SpreeAvatax::Shared.taxable_order?(order)
 
       taxable_records = order.line_items + order.shipments
@@ -66,6 +71,11 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     end
 
     def commit(order)
+      if !SpreeAvatax::Config.enabled
+        logger.info("Avatax disabled. Skipping SalesInvoice.commit for order #{order.number}")
+        return
+      end
+
       return if !SpreeAvatax::Shared.taxable_order?(order)
 
       raise CommitInvoiceNotFound.new("No invoice for order #{order.number}") if order.avatax_sales_invoice.nil?
@@ -84,6 +94,11 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     end
 
     def cancel(order)
+      if !SpreeAvatax::Config.enabled
+        logger.info("Avatax disabled. Skipping SalesInvoice.cancel for order #{order.number}")
+        return
+      end
+
       return if order.avatax_sales_invoice.nil?
 
       result = cancel_tax(order.avatax_sales_invoice)

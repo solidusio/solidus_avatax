@@ -31,6 +31,11 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
     # After the reimbursement completes the ".finalize" method will get called and we'll commit the
     #   return invoice.
     def generate(reimbursement)
+      if !SpreeAvatax::Config.enabled
+        logger.info("Avatax disabled. Skipping ReturnInvoice.generate for reimbursement #{reimbursement.number}")
+        return
+      end
+
       success_result = get_tax(reimbursement)
 
       if reimbursement.return_invoice
@@ -74,6 +79,11 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
     # On failure it will raise.
     # On success it markes the invoice as committed.
     def finalize(reimbursement)
+      if !SpreeAvatax::Config.enabled
+        logger.info("Avatax disabled. Skipping ReturnInvoice.finalize for reimbursement #{reimbursement.number}")
+        return
+      end
+
       post_tax(reimbursement.return_invoice)
 
       reimbursement.return_invoice.update!(committed: true)

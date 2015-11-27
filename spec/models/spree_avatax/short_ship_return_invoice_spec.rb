@@ -131,6 +131,17 @@ describe SpreeAvatax::ShortShipReturnInvoice do
 
         SpreeAvatax::ShortShipReturnInvoice.generate(unit_cancels: unit_cancels)
       end
+
+      context 'when avatax is disabled' do
+        let!(:config) { create(:avatax_config, enabled: false) }
+
+        it 'does nothing' do
+          expect(SpreeAvatax::Shared).to_not receive(:tax_svc)
+          expect {
+            subject
+          }.to_not change { SpreeAvatax::ShortShipReturnInvoice.count }
+        end
+      end
     end
 
     context 'with a successful response' do
