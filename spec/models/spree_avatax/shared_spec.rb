@@ -86,4 +86,58 @@ describe SpreeAvatax::Shared do
       end
     end
   end
+
+  describe '.get_tax' do
+    it 'calls gettax' do
+      params = {}
+      expect(SpreeAvatax::Shared.tax_svc).to receive(:gettax).with(params)
+      SpreeAvatax::Shared.get_tax(params)
+    end
+
+    context 'with a timeout' do
+      let!(:config) { create(:avatax_config, timeout: 0.001) }
+      it 'times out' do
+        expect(SpreeAvatax::Shared.tax_svc).to(receive(:gettax) { sleep 0.1 })
+        expect {
+          SpreeAvatax::Shared.get_tax({})
+        }.to raise_error(SpreeAvatax::AvataxTimeout)
+      end
+    end
+  end
+
+  describe '.post_tax' do
+    it 'calls posttax' do
+      params = {}
+      expect(SpreeAvatax::Shared.tax_svc).to receive(:posttax).with(params)
+      SpreeAvatax::Shared.post_tax(params)
+    end
+
+    context 'with a timeout' do
+      let!(:config) { create(:avatax_config, timeout: 0.001) }
+      it 'times out' do
+        expect(SpreeAvatax::Shared.tax_svc).to(receive(:posttax) { sleep 0.1 })
+        expect {
+          SpreeAvatax::Shared.post_tax({})
+        }.to raise_error(SpreeAvatax::AvataxTimeout)
+      end
+    end
+  end
+
+  describe '.cancel_tax' do
+    it 'calls canceltax' do
+      params = {}
+      expect(SpreeAvatax::Shared.tax_svc).to receive(:canceltax).with(params)
+      SpreeAvatax::Shared.cancel_tax(params)
+    end
+
+    context 'with a timeout' do
+      let!(:config) { create(:avatax_config, timeout: 0.001) }
+      it 'times out' do
+        expect(SpreeAvatax::Shared.tax_svc).to(receive(:canceltax) { sleep 0.1 })
+        expect {
+          SpreeAvatax::Shared.cancel_tax({})
+        }.to raise_error(SpreeAvatax::AvataxTimeout)
+      end
+    end
+  end
 end

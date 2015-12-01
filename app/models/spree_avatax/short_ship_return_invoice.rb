@@ -48,7 +48,7 @@ class SpreeAvatax::ShortShipReturnInvoice < ActiveRecord::Base
       logger.info("[avatax] gettax unit_cancel_ids=#{unit_cancels.map(&:id)} doc_type=#{DOC_TYPE}")
       logger.debug("[avatax] params: " + params.to_json)
 
-      response = SpreeAvatax::Shared.tax_svc.gettax(params)
+      response = SpreeAvatax::Shared.get_tax(params)
       SpreeAvatax::Shared.require_success!(response)
 
       response

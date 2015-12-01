@@ -87,7 +87,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
       avatax_logger.info "AVATAX_REQUEST context=get_tax reimbursement_id=#{reimbursement.id}"
       avatax_logger.debug params.to_json
 
-      result = SpreeAvatax::Shared.tax_svc.gettax(params)
+      result = SpreeAvatax::Shared.get_tax(params)
       require_success!(result, reimbursement, 'get_tax')
 
       result
@@ -99,7 +99,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
       avatax_logger.info "AVATAX_REQUEST context=post_tax reimbursement_id=#{return_invoice.reimbursement.id} return_invoice_id=#{return_invoice.id}"
       avatax_logger.debug params.to_json
 
-      result = SpreeAvatax::Shared.tax_svc.posttax(params)
+      result = SpreeAvatax::Shared.post_tax(params)
       require_success!(result, return_invoice.reimbursement, 'post_tax')
 
       result

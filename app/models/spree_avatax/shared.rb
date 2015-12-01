@@ -28,6 +28,24 @@ module SpreeAvatax::Shared
       order.line_items.present? && order.ship_address.present?
     end
 
+    def get_tax(params)
+      with_timeout do
+        tax_svc.gettax(params)
+      end
+    end
+
+    def post_tax(params)
+      with_timeout do
+        tax_svc.posttax(params)
+      end
+    end
+
+    def cancel_tax(params)
+      with_timeout do
+        tax_svc.canceltax(params)
+      end
+    end
+
     def tax_svc
       @tax_svc ||= AvaTax::TaxService.new({
         username:               SpreeAvatax::Config.username,
@@ -35,6 +53,12 @@ module SpreeAvatax::Shared
         service_url:            SpreeAvatax::Config.service_url,
         clientname:             'Spree::Avatax',
       })
+    end
+
+    def with_timeout
+      Timeout.timeout(SpreeAvatax::Config.timeout, SpreeAvatax::AvataxTimeout) do
+        yield
+      end
     end
 
     def require_success!(response)
