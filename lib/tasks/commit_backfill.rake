@@ -29,13 +29,6 @@ namespace :spree_avatax do
 
     # PREP TO ITERATE OVER ORDERS
 
-    tax_svc = AvaTax::TaxService.new({
-      username:               SpreeAvatax::Config.username,
-      password:               SpreeAvatax::Config.password,
-      service_url:            SpreeAvatax::Config.service_url,
-      clientname:             'Spree::Avatax',
-    })
-
     handle_result_errors = ->(result, order, request_method) do
       puts
       puts "** Error on order id=#{order.id} number=#{order.number} **"
@@ -63,7 +56,7 @@ namespace :spree_avatax do
         detaillevel: 'Tax',
       }
 
-      history_result = tax_svc.gettaxhistory(history_request)
+      history_result = SpreeAvatax::Shared.tax_svc.gettaxhistory(history_request)
 
       if history_result[:result_code] != 'Success'
         error_count += 1
@@ -91,7 +84,7 @@ namespace :spree_avatax do
         totaltax:    history_result[:get_tax_result][:total_tax],
       }
 
-      post_result = tax_svc.posttax(post_request)
+      post_result = SpreeAvatax::Shared.tax_svc.posttax(post_request)
 
       if post_result[:result_code] != 'Success'
         error_count += 1

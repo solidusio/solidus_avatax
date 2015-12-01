@@ -57,7 +57,7 @@ describe SpreeAvatax::ReturnInvoice do
     end
 
     before do
-      expect(SpreeAvatax::ReturnInvoice.send(:tax_svc))
+      expect(SpreeAvatax::Shared.tax_svc)
         .to receive(:gettax)
         .with(expected_gettax_params)
         .and_return(gettax_response)
@@ -171,7 +171,7 @@ describe SpreeAvatax::ReturnInvoice do
     end
 
     before do
-      expect(SpreeAvatax::ReturnInvoice.send(:tax_svc))
+      expect(SpreeAvatax::Shared.tax_svc)
         .to receive(:posttax)
         .with(expected_posttax_params)
         .and_return(
