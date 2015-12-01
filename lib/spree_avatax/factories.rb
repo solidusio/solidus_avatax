@@ -22,4 +22,9 @@ FactoryGirl.define do
     pre_tax_total { reimbursement.return_items.sum(:pre_tax_amount) }
     additional_tax_total { reimbursement.return_items.sum(:additional_tax_total) }
   end
+
+  factory :avatax_config, class: SpreeAvatax::Config do
+    enabled true
+    timeout SpreeAvatax::Config::DEFAULT_TIMEOUT
+  end
 end

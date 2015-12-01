@@ -1,5 +1,7 @@
 module SpreeAvatax
-  class Config
+  class Config < Spree::Base
+    DEFAULT_TIMEOUT = 20
+
     class << self
       attr_accessor :username
       attr_accessor :password
@@ -11,6 +13,17 @@ module SpreeAvatax
       attr_accessor :sales_invoice_generate_error_handler
       attr_accessor :sales_invoice_commit_error_handler
       attr_accessor :sales_invoice_cancel_error_handler
+
+      def timeout
+        (config = last) ? config.timeout : DEFAULT_TIMEOUT
+      end
+
+      def enabled
+        (config = last) ? config.enabled : true
+      end
     end
+
+    validates :enabled, inclusion: {in: [true, false]}
+    validates :timeout, presence: true
   end
 end
