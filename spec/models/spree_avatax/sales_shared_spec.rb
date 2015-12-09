@@ -7,10 +7,19 @@ describe SpreeAvatax::SalesShared do
       SpreeAvatax::SalesShared.reset_tax_attributes(order)
     end
 
-    let(:order) { create(:order_with_line_items, additional_tax_total: 1, adjustment_total: 1, included_tax_total: 1, line_items_count: 1) }
+    let(:order) do
+      create(:order_with_line_items,
+        line_items_count: 1, # quantity set to 2 below
+        line_items_price: 3,
+        shipment_cost: 5,
+      )
+    end
     let(:line_item) { order.line_items.first }
+    let(:shipment) { order.shipments.first }
 
     before do
+      line_item.update_attributes!(quantity: 2)
+
       line_item.adjustments.eligible.tax.additional.create!({
         adjustable: line_item,
         amount: 1.23,
@@ -42,6 +51,12 @@ describe SpreeAvatax::SalesShared do
     it 'should remove all eligible tax adjustments' do
       subject
       expect(line_item.adjustments.tax.count).to eq 0
+    end
+
+    it 'sets pre_tax_amount to discounted_amount' do
+      subject
+      expect(line_item.reload.pre_tax_amount).to eq(2 * 3)
+      expect(shipment.reload.pre_tax_amount).to eq(5)
     end
   end
 end
