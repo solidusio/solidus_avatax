@@ -14,12 +14,21 @@ module SpreeAvatax
       attr_accessor :sales_invoice_commit_error_handler
       attr_accessor :sales_invoice_cancel_error_handler
 
+      # These configurations are stored in the database so that they can be
+      # updated immediately and synchronously across all servers in the event of
+      # an outage, without a redeploy or restart.
       def timeout
-        (config = last) ? config.timeout : DEFAULT_TIMEOUT
+        (config = active) ? config.timeout : DEFAULT_TIMEOUT
       end
 
       def enabled
-        (config = last) ? config.enabled : true
+        (config = active) ? config.enabled : true
+      end
+
+      private
+
+      def active
+        order(:id).last
       end
     end
 
