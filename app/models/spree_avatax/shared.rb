@@ -29,21 +29,15 @@ module SpreeAvatax::Shared
     end
 
     def get_tax(params)
-      with_timeout do
-        tax_svc.gettax(params)
-      end
+      call_tax_svc_with_timeout(:gettax, params)
     end
 
     def post_tax(params)
-      with_timeout do
-        tax_svc.posttax(params)
-      end
+      call_tax_svc_with_timeout(:posttax, params)
     end
 
     def cancel_tax(params)
-      with_timeout do
-        tax_svc.canceltax(params)
-      end
+      call_tax_svc_with_timeout(:canceltax, params)
     end
 
     def tax_svc
@@ -55,9 +49,10 @@ module SpreeAvatax::Shared
       })
     end
 
-    def with_timeout
+    # We looked at the code in the AvaTax gem and using timeout here seems safe.
+    def call_tax_svc_with_timeout(method, *args)
       Timeout.timeout(SpreeAvatax::Config.timeout, SpreeAvatax::AvataxTimeout) do
-        yield
+        tax_svc.public_send(method, *args)
       end
     end
 
