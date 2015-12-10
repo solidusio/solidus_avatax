@@ -30,7 +30,7 @@ module SpreeAvatax::SalesShared
       tax_line_data.each do |data|
         record, tax_line = data[:record], data[:tax_line]
 
-        record.update_column(:pre_tax_amount, record.discounted_amount)
+        record.update_column(:pre_tax_amount, record.discounted_amount.round(2))
 
         tax = BigDecimal.new(tax_line[:tax]).abs
 
@@ -101,16 +101,17 @@ module SpreeAvatax::SalesShared
       destroyed_adjustments = order.all_adjustments.tax.destroy_all
       return if destroyed_adjustments.empty?
 
-      order.line_items.each do |line_item|
-        line_item.update_attributes!({
+      taxable_records = order.line_items + order.shipments
+      taxable_records.each do |taxable_record|
+        taxable_record.update_attributes!({
           additional_tax_total: 0,
           adjustment_total: 0,
-          pre_tax_amount: 0,
+          pre_tax_amount: taxable_record.discounted_amount.round(2),
           included_tax_total: 0,
         })
 
-        Spree::ItemAdjustments.new(line_item).update
-        line_item.save!
+        Spree::ItemAdjustments.new(taxable_record).update
+        taxable_record.save!
       end
 
       order.update_attributes!({
