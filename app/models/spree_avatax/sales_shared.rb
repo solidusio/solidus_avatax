@@ -99,6 +99,18 @@ module SpreeAvatax::SalesShared
     def reset_tax_attributes(order)
       return if order.completed?
 
+      # Delete the avatax_sales_invoice to avoid accidentally committing it
+      # later.
+      if invoice = order.avatax_sales_invoice
+        if invoice.committed_at
+          raise SpreeAvatax::SalesInvoice::AlreadyCommittedError.new(
+            "Tried to clear tax attributes for already-committed order #{order.number}"
+          )
+        else
+          invoice.destroy!
+        end
+      end
+
       destroyed_adjustments = order.all_adjustments.tax.destroy_all
       return if destroyed_adjustments.empty?
 

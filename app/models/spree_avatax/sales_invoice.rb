@@ -47,6 +47,8 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
         end
       end
 
+      SpreeAvatax::SalesShared.update_taxes(order, tax_line_data)
+
       sales_invoice = order.create_avatax_sales_invoice!({
         transaction_id:        result[:transaction_id],
         doc_id:                result[:doc_id],
@@ -55,8 +57,6 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
         pre_tax_total:         result[:total_amount],
         additional_tax_total:  result[:total_tax],
       })
-
-      SpreeAvatax::SalesShared.update_taxes(order, tax_line_data)
 
       sales_invoice
     rescue Exception => e

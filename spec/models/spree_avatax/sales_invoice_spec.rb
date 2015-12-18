@@ -331,6 +331,22 @@ describe SpreeAvatax::SalesInvoice do
         }.to_not change { SpreeAvatax::SalesInvoice.count }
       end
     end
+
+    context 'when an error occurs during tax updating' do
+      it 'does not create a SalesInvoice record' do
+        error = StandardError.new
+
+        expect(SpreeAvatax::SalesShared)
+          .to receive(:update_taxes)
+          .and_raise(error)
+
+        expect {
+          expect { subject }.to raise_error(error)
+        }.to_not change {
+          SpreeAvatax::SalesInvoice.count
+        }
+      end
+    end
   end
 
   describe '.commit' do
