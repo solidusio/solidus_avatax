@@ -28,6 +28,18 @@ module SpreeAvatax::Shared
       order.line_items.present? && order.ship_address.present?
     end
 
+    def get_tax(params)
+      call_tax_svc_with_timeout(:gettax, params)
+    end
+
+    def post_tax(params)
+      call_tax_svc_with_timeout(:posttax, params)
+    end
+
+    def cancel_tax(params)
+      call_tax_svc_with_timeout(:canceltax, params)
+    end
+
     def tax_svc
       @tax_svc ||= AvaTax::TaxService.new({
         username:               SpreeAvatax::Config.username,
@@ -35,6 +47,13 @@ module SpreeAvatax::Shared
         service_url:            SpreeAvatax::Config.service_url,
         clientname:             'Spree::Avatax',
       })
+    end
+
+    # We looked at the code in the AvaTax gem and using timeout here seems safe.
+    def call_tax_svc_with_timeout(method, *args)
+      Timeout.timeout(SpreeAvatax::Config.timeout, SpreeAvatax::AvataxTimeout) do
+        tax_svc.public_send(method, *args)
+      end
     end
 
     def require_success!(response)

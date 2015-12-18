@@ -22,6 +22,22 @@ rails g solidus_avatax:install
 Configuration
 -------------
 
+#### Disabling Avatax and Avatax API Timeouts
+
+In case of service problems or outages on Avatax's end, you can disable Avatax
+or change the API timeout. These values are stored in the database so that they
+can be applied instantly and without restarting your application.  To change the
+values create a new SpreeAvatax::Config. The default values are:
+
+```ruby
+SpreeAvatax::Config.create!(enabled: true, timeout: SpreeAvatax::Config::DEFAULT_TIMEOUT)
+```
+
+This is an append-only table and solidus_avatax will read these config values
+from the last record (by id).
+
+#### Short Ships
+
 If you want to notify Avatax about short ships you should configure the
 following:
 

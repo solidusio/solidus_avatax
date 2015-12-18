@@ -18,7 +18,8 @@ module SpreeAvatax::SalesShared
       logger.info "[avatax] gettax order=#{order.id} doc_type=#{doc_type}"
       logger.debug { "[avatax] params: #{params.to_json}" }
 
-      response = SpreeAvatax::Shared.tax_svc.gettax(params)
+      response = SpreeAvatax::Shared.get_tax(params)
+
       SpreeAvatax::Shared.require_success!(response)
 
       response

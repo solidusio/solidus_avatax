@@ -22,6 +22,11 @@ class SpreeAvatax::ShortShipReturnInvoice < ActiveRecord::Base
     #
     # On failure it will raise.
     def generate(unit_cancels:)
+      if !SpreeAvatax::Config.enabled
+        logger.info("Avatax disabled. Skipping ShortShipReturnInvoice.generate for unit_cancels #{unit_cancels.map(&:id)}")
+        return
+      end
+
       inventory_units = unit_cancels.map(&:inventory_unit)
 
       order_ids = inventory_units.map(&:order_id).uniq
@@ -48,7 +53,7 @@ class SpreeAvatax::ShortShipReturnInvoice < ActiveRecord::Base
       logger.info("[avatax] gettax unit_cancel_ids=#{unit_cancels.map(&:id)} doc_type=#{DOC_TYPE}")
       logger.debug("[avatax] params: " + params.to_json)
 
-      response = SpreeAvatax::Shared.tax_svc.gettax(params)
+      response = SpreeAvatax::Shared.get_tax(params)
       SpreeAvatax::Shared.require_success!(response)
 
       response
