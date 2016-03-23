@@ -12,12 +12,6 @@ Spree::TaxRate.class_eval do
       # do nothing.  we'll take care of this ourselves at different points via the various hooks we have in place
     end
 
-    def store_pre_tax_amount
-      # do nothing.  this is only for "included" and we don't support included tax.
-      # also, we perform calculations at a different time.
-      # this should never be called anyway because only TaxRate.adjust calls it, but we override it just to be safe.
-    end
-
     # require exactly one tax rate.  if that's not true then alert ourselves and carry on as best we can
     def avatax_the_one_rate
       rates = all.to_a

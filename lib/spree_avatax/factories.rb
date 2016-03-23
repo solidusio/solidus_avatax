@@ -9,8 +9,8 @@ FactoryGirl.define do
     doc_id { generate(:doc_id) }
     doc_code { order.number }
     doc_date { order.completed_at.try(:to_date) || 1.day.ago }
-    pre_tax_total { order.line_items.sum(:pre_tax_amount) }
-    additional_tax_total { order.line_items.sum(:additional_tax_total) }
+    pre_tax_total { order.total - order.additional_tax_total }
+    additional_tax_total { order.additional_tax_total }
   end
 
   factory :return_invoice, class: SpreeAvatax::ReturnInvoice do
@@ -19,7 +19,7 @@ FactoryGirl.define do
     doc_id { generate(:doc_id) }
     doc_code { reimbursement.number }
     doc_date { reimbursement.order.avatax_invoice_at.try(:to_date) || reimbursement.order.completed_at.to_date }
-    pre_tax_total { reimbursement.return_items.sum(:pre_tax_amount) }
+    pre_tax_total { reimbursement.return_items.sum(:amount) }
     additional_tax_total { reimbursement.return_items.sum(:additional_tax_total) }
   end
 
