@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe "Taxes with Store Credits" do
   let(:user) { FactoryGirl.create(:user, password: "Alderaan") }
+  let!(:store) { create(:store, default: true) }
 
   before do
     # Set up Avatax (just in case we don't have a cassette)
