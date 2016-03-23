@@ -30,11 +30,6 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
 
       return if order.completed? || !SpreeAvatax::Shared.taxable_order?(order)
 
-      taxable_records = order.line_items + order.shipments
-      taxable_records.each do |taxable_record|
-        taxable_record.update_column(:pre_tax_amount, taxable_record.discounted_amount.round(2))
-      end
-
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
       # run this immediately to ensure that everything matches up before modifying the database
       tax_line_data = SpreeAvatax::SalesShared.build_tax_line_data(order, result)

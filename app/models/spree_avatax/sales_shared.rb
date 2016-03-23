@@ -31,8 +31,6 @@ module SpreeAvatax::SalesShared
       tax_line_data.each do |data|
         record, tax_line = data[:record], data[:tax_line]
 
-        record.update_column(:pre_tax_amount, record.discounted_amount.round(2))
-
         tax = BigDecimal.new(tax_line[:tax]).abs
 
         record.adjustments.tax.create!({
@@ -119,7 +117,6 @@ module SpreeAvatax::SalesShared
         taxable_record.update_attributes!({
           additional_tax_total: 0,
           adjustment_total: 0,
-          pre_tax_amount: taxable_record.discounted_amount.round(2),
           included_tax_total: 0,
         })
 

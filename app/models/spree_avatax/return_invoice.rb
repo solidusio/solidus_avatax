@@ -169,7 +169,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
           itemcode:            return_item.inventory_unit.line_item.variant.sku,
           taxcode:             return_item.inventory_unit.line_item.tax_category.tax_code,
           qty:                 1,
-          amount:              -return_item.pre_tax_amount,
+          amount:              -return_item.amount,
           origincodeline:      DESTINATION_CODE, # We don't really send the correct value here
           destinationcodeline: DESTINATION_CODE,
 
