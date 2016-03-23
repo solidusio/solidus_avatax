@@ -29,12 +29,4 @@ describe Spree::TaxRate do
       }.to raise_error(SpreeAvatax::TaxRateInvalidOperation)
     end
   end
-
-  describe '#compute_amount' do
-    it 'raises TaxRateInvalidOperation' do
-      expect {
-        tax_rate.compute_amount(nil)
-      }.to raise_error(SpreeAvatax::TaxRateInvalidOperation)
-    end
-  end
 end
