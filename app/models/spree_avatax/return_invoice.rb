@@ -10,9 +10,6 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
   class AlreadyCommittedError < StandardError; end
   class ReturnItemResponseMissing < StandardError; end
 
-  class_attribute :avatax_logger
-  self.avatax_logger = Logger.new(Rails.root.join('log/avatax.log'))
-
   belongs_to :reimbursement, class_name: "Spree::Reimbursement"
 
   validates :reimbursement, presence: true
@@ -94,8 +91,8 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
     def get_tax(reimbursement)
       params = get_tax_params(reimbursement)
 
-      avatax_logger.info "AVATAX_REQUEST context=get_tax reimbursement_id=#{reimbursement.id}"
-      avatax_logger.debug params.to_json
+      logger.info "AVATAX_REQUEST context=get_tax reimbursement_id=#{reimbursement.id}"
+      logger.debug params.to_json
 
       result = SpreeAvatax::Shared.get_tax(params)
       require_success!(result, reimbursement, 'get_tax')
@@ -106,8 +103,8 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
     def post_tax(return_invoice)
       params = post_tax_params(return_invoice)
 
-      avatax_logger.info "AVATAX_REQUEST context=post_tax reimbursement_id=#{return_invoice.reimbursement.id} return_invoice_id=#{return_invoice.id}"
-      avatax_logger.debug params.to_json
+      logger.info "AVATAX_REQUEST context=post_tax reimbursement_id=#{return_invoice.reimbursement.id} return_invoice_id=#{return_invoice.id}"
+      logger.debug params.to_json
 
       result = SpreeAvatax::Shared.post_tax(params)
       require_success!(result, return_invoice.reimbursement, 'post_tax')
@@ -117,11 +114,11 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
 
     def require_success!(result, reimbursement, context)
       if result[:result_code] == 'Success'
-        avatax_logger.info "AVATAX_RESPONSE context=#{context} result=success reimbursement_id=#{reimbursement.id} doc_id=#{result[:doc_id]}"
-        avatax_logger.debug result.to_json
+        logger.info "AVATAX_RESPONSE context=#{context} result=success reimbursement_id=#{reimbursement.id} doc_id=#{result[:doc_id]}"
+        logger.debug result.to_json
       else
-        avatax_logger.error "AVATAX_RESPONSE context=#{context} result=error reimbursement_id=#{reimbursement.id} doc_id=#{result[:doc_id]}"
-        avatax_logger.error result.to_json
+        logger.error "AVATAX_RESPONSE context=#{context} result=error reimbursement_id=#{reimbursement.id} doc_id=#{result[:doc_id]}"
+        logger.error result.to_json
 
         raise AvataxApiError.new("#{context} error: #{result[:messages]}")
       end
