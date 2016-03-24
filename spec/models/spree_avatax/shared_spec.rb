@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe SpreeAvatax::Shared do
-  describe '.logger' do
-    subject { SpreeAvatax::Shared.logger }
-    it { is_expected.to be_a Logger }
-  end
-
   describe '.taxable_order?' do
     subject { SpreeAvatax::Shared.taxable_order?(order) }
 

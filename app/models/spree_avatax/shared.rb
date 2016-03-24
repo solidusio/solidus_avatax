@@ -20,10 +20,6 @@ module SpreeAvatax::Shared
 
   class << self
 
-    def logger
-      Rails.logger
-    end
-
     def taxable_order?(order)
       order.line_items.present? && order.ship_address.present?
     end
@@ -58,11 +54,11 @@ module SpreeAvatax::Shared
 
     def require_success!(response)
       if response[:result_code] == 'Success'
-        logger.info "[avatax] response - result=success doc_id=#{response[:doc_id]} doc_code=#{response[:doc_code]} transaction_id=#{response[:transaction_id]}"
-        logger.debug { "[avatax] response: #{response.to_json}" }
+        Rails.logger.info "[avatax] response - result=success doc_id=#{response[:doc_id]} doc_code=#{response[:doc_code]} transaction_id=#{response[:transaction_id]}"
+        Rails.logger.debug { "[avatax] response: #{response.to_json}" }
       else
-        logger.error "[avatax] response - result=error doc_id=#{response[:doc_id]} doc_code=#{response[:doc_code]} transaction_id=#{response[:transaction_id]}"
-        logger.error "[avatax] response: #{response.to_json}"
+        Rails.logger.error "[avatax] response - result=error doc_id=#{response[:doc_id]} doc_code=#{response[:doc_code]} transaction_id=#{response[:transaction_id]}"
+        Rails.logger.error "[avatax] response: #{response.to_json}"
         raise FailedApiResponse.new(response)
       end
     end
