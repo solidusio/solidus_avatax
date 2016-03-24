@@ -5,6 +5,7 @@ describe "Tax Calculation" do
   let(:address) { create(:address, address1: "35 Crosby St", city: "New York", zipcode: 10013) }
   let(:line_item_1) { order.line_items.first }
   let(:line_item_2) { order.line_items.last }
+  let(:shipment) { order.shipments.first }
 
   before do
     # Set up Avatax (just in case we don't have a cassette)
@@ -14,6 +15,25 @@ describe "Tax Calculation" do
     SpreeAvatax::Config.company_code = ENV["AVATAX_COMPANY_CODE"]
 
     order.line_items.first.product.tax_category.tax_rates << Spree::TaxRate.first
+
+    expect(SpreeAvatax::SalesShared).to(
+      receive(:avatax_id).
+        with(line_item_1).
+        at_least(:once).
+        and_return('Spree::LineItem-1')
+    )
+    expect(SpreeAvatax::SalesShared).to(
+      receive(:avatax_id).
+        with(line_item_2).
+        at_least(:once).
+        and_return('Spree::LineItem-2')
+    )
+    expect(SpreeAvatax::SalesShared).to(
+      receive(:avatax_id).
+        with(shipment).
+        at_least(:once).
+        and_return('Spree::Shipment-1')
+    )
   end
 
   context "without discounts" do

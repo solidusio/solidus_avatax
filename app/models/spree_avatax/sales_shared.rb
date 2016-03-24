@@ -71,7 +71,7 @@ module SpreeAvatax::SalesShared
         if data[avatax_id]
           data[avatax_id][:tax_line] = tax_line
         else
-          raise InvalidApiResponse.new("Couldn't find #{avatax_id.inspect}")
+          raise InvalidApiResponse.new("Couldn't find #{avatax_id.inspect} from avatax response in known ids #{data.keys.inspect}")
         end
       end
 
