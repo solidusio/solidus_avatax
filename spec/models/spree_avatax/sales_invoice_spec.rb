@@ -41,7 +41,7 @@ describe SpreeAvatax::SalesInvoice do
 
         addresses: [
           {
-            addresscode: SpreeAvatax::SalesShared::DESTINATION_CODE,
+            addresscode: SpreeAvatax::SalesInvoice::DESTINATION_CODE,
             line1:       REXML::Text.normalize(order.ship_address.address1),
             line2:       REXML::Text.normalize(order.ship_address.address2),
             city:        REXML::Text.normalize(order.ship_address.city),
@@ -54,8 +54,8 @@ describe SpreeAvatax::SalesInvoice do
             no:                  "Spree::LineItem-#{line_item.id}",
             qty:                 line_item.quantity,
             amount:              line_item.discounted_amount.round(2).to_f,
-            origincodeline:      SpreeAvatax::SalesShared::DESTINATION_CODE,
-            destinationcodeline: SpreeAvatax::SalesShared::DESTINATION_CODE,
+            origincodeline:      SpreeAvatax::SalesInvoice::DESTINATION_CODE,
+            destinationcodeline: SpreeAvatax::SalesInvoice::DESTINATION_CODE,
 
             description: expected_truncated_description,
 
@@ -67,12 +67,12 @@ describe SpreeAvatax::SalesInvoice do
             no:                  "Spree::Shipment-#{shipment.id}",
             qty:                 1,
             amount:              shipment.discounted_amount.round(2).to_f,
-            origincodeline:      SpreeAvatax::SalesShared::DESTINATION_CODE,
-            destinationcodeline: SpreeAvatax::SalesShared::DESTINATION_CODE,
+            origincodeline:      SpreeAvatax::SalesInvoice::DESTINATION_CODE,
+            destinationcodeline: SpreeAvatax::SalesInvoice::DESTINATION_CODE,
 
-            description: SpreeAvatax::SalesShared::SHIPPING_DESCRIPTION,
+            description: SpreeAvatax::SalesInvoice::SHIPPING_DESCRIPTION,
 
-            taxcode:    SpreeAvatax::SalesShared::SHIPPING_TAX_CODE,
+            taxcode:    SpreeAvatax::SalesInvoice::SHIPPING_TAX_CODE,
             discounted: false,
           },
         ],
@@ -196,7 +196,7 @@ describe SpreeAvatax::SalesInvoice do
       end
 
       before do
-        expect(SpreeAvatax::SalesShared)
+        expect(SpreeAvatax::SalesInvoice)
           .to receive(:get_tax)
           .and_raise(error)
 
@@ -235,7 +235,7 @@ describe SpreeAvatax::SalesInvoice do
       it 'raises InvalidApiResponse' do
         expect {
           subject
-        }.to raise_error(SpreeAvatax::SalesShared::InvalidApiResponse)
+        }.to raise_error(SpreeAvatax::SalesInvoice::InvalidApiResponse)
       end
     end
 
@@ -324,7 +324,7 @@ describe SpreeAvatax::SalesInvoice do
       it 'does not create a SalesInvoice record' do
         error = StandardError.new
 
-        expect(SpreeAvatax::SalesShared)
+        expect(SpreeAvatax::SalesInvoice)
           .to receive(:update_taxes)
           .and_raise(error)
 
@@ -519,6 +519,80 @@ describe SpreeAvatax::SalesInvoice do
         it 'does nothing' do
           subject
           expect(sales_invoice.canceled_at?).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe '.reset_tax_attributes' do
+    subject do
+      SpreeAvatax::SalesInvoice.reset_tax_attributes(order)
+    end
+
+    let(:order) do
+      create(:order_with_line_items,
+        line_items_count: 1, # quantity set to 2 below
+        line_items_price: 3,
+        shipment_cost: 5,
+      )
+    end
+    let(:line_item) { order.line_items.first }
+    let(:shipment) { order.shipments.first }
+
+    before do
+      line_item.update_attributes!(quantity: 2)
+
+      line_item.adjustments.eligible.tax.additional.create!({
+        adjustable: line_item,
+        amount: 1.23,
+        order: order,
+        label: 'Previous Tax',
+        included: false,
+        finalized: true,
+      })
+
+      line_item.update_attributes!({
+        additional_tax_total: 1,
+        adjustment_total: 1,
+        included_tax_total: 1,
+      })
+    end
+
+    context 'when order is completed' do
+      before do
+        order.update_attributes!(completed_at: Time.now)
+      end
+
+      it 'should leave adjustments in place' do
+        subject
+        expect(line_item.adjustments.tax.count).to eq 1
+      end
+    end
+
+    it 'should remove all eligible tax adjustments' do
+      subject
+      expect(line_item.adjustments.tax.count).to eq 0
+    end
+
+    context 'when a SalesInvoice record is present' do
+      let!(:sales_invoice) { create(:avatax_sales_invoice, order: order) }
+
+      it 'deletes the SalesInvoice record if present' do
+        subject
+        expect(order.reload.avatax_sales_invoice).to eq(nil)
+      end
+
+      context 'when the SalesInvoice is committed' do
+        before do
+          sales_invoice.update!(committed_at: Time.now)
+        end
+
+        it 'raises without clearing anything' do
+          expect {
+            subject
+          }.to raise_error(SpreeAvatax::SalesInvoice::AlreadyCommittedError)
+
+          expect(line_item.adjustments.tax.count).to eq(1)
         end
       end
     end

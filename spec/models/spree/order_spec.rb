@@ -51,7 +51,7 @@ describe Spree::Order do
     end
 
     it "clears tax" do
-      expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
+      expect(SpreeAvatax::SalesInvoice).to receive(:reset_tax_attributes).with(order)
       subject.next!
     end
   end

@@ -5,7 +5,7 @@ Spree::Order.class_eval do
   after_save :avatax_order_after_save
 
   state_machine.after_transition from: :address do |order, transition|
-    SpreeAvatax::SalesShared.reset_tax_attributes(order)
+    SpreeAvatax::SalesInvoice.reset_tax_attributes(order)
   end
 
   state_machine.before_transition to: :payment do |order, transition|

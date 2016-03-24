@@ -60,13 +60,13 @@ RSpec.describe "Taxes with Store Credits" do
     it "adjusts the credits to cover taxes" do
       # Use a cassette so that we don't hit the Avatax API all of the time.
       VCR.use_cassette("taxes_with_store_credits") do
-        expect(SpreeAvatax::SalesShared).to(
+        expect(SpreeAvatax::SalesInvoice).to(
           receive(:avatax_id).
             with(an_instance_of(Spree::LineItem)).
             at_least(:once).
             and_return('Spree::LineItem-1')
         )
-        expect(SpreeAvatax::SalesShared).to(
+        expect(SpreeAvatax::SalesInvoice).to(
           receive(:avatax_id).
             with(an_instance_of(Spree::Shipment)).
             at_least(:once).

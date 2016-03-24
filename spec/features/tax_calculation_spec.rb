@@ -16,19 +16,19 @@ describe "Tax Calculation" do
 
     order.line_items.first.product.tax_category.tax_rates << Spree::TaxRate.first
 
-    expect(SpreeAvatax::SalesShared).to(
+    expect(SpreeAvatax::SalesInvoice).to(
       receive(:avatax_id).
         with(line_item_1).
         at_least(:once).
         and_return('Spree::LineItem-1')
     )
-    expect(SpreeAvatax::SalesShared).to(
+    expect(SpreeAvatax::SalesInvoice).to(
       receive(:avatax_id).
         with(line_item_2).
         at_least(:once).
         and_return('Spree::LineItem-2')
     )
-    expect(SpreeAvatax::SalesShared).to(
+    expect(SpreeAvatax::SalesInvoice).to(
       receive(:avatax_id).
         with(shipment).
         at_least(:once).

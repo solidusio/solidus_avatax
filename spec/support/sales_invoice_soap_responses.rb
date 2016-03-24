@@ -20,7 +20,7 @@ module SalesInvoiceSoapResponses
       tax_lines: {
         tax_line: [
           {
-            no: SpreeAvatax::SalesShared.avatax_id(line_item),
+            no: SpreeAvatax::SalesInvoice.avatax_id(line_item),
             tax_code: "P0000000",
             taxability: true,
             boundary_level: "Zip5",
@@ -101,7 +101,7 @@ module SalesInvoiceSoapResponses
             accounting_method: "Accrual"
           },
           {
-            no: SpreeAvatax::SalesShared.avatax_id(shipment),
+            no: SpreeAvatax::SalesInvoice.avatax_id(shipment),
             tax_code: "FR020100",
             taxability: true,
             boundary_level: "Zip5",

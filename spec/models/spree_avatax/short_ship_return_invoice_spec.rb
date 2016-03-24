@@ -7,7 +7,7 @@ describe SpreeAvatax::ShortShipReturnInvoice do
     before do
       # disable avatax tax calculation. we're not testing calculating tax.
       allow(SpreeAvatax::Shared).to receive(:taxable_order?).and_return(false)
-      allow(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes)
+      allow(SpreeAvatax::SalesInvoice).to receive(:reset_tax_attributes)
     end
 
     let(:order) do
