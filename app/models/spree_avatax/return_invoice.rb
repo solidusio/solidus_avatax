@@ -6,7 +6,6 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
   TAX_OVERRIDE_TYPE = 'TaxDate'
   TAX_OVERRIDE_REASON = 'Adjustment for return'
 
-  class AvataxApiError < StandardError; end
   class AlreadyCommittedError < StandardError; end
   class ReturnItemResponseMissing < StandardError; end
 
@@ -95,7 +94,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
       logger.debug params.to_json
 
       result = SpreeAvatax::Shared.get_tax(params)
-      require_success!(result, reimbursement, 'get_tax')
+      SpreeAvatax::Shared.require_success!(result)
 
       result
     end
@@ -107,21 +106,9 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
       logger.debug params.to_json
 
       result = SpreeAvatax::Shared.post_tax(params)
-      require_success!(result, return_invoice.reimbursement, 'post_tax')
+      SpreeAvatax::Shared.require_success!(result)
 
       result
-    end
-
-    def require_success!(result, reimbursement, context)
-      if result[:result_code] == 'Success'
-        logger.info "AVATAX_RESPONSE context=#{context} result=success reimbursement_id=#{reimbursement.id} doc_id=#{result[:doc_id]}"
-        logger.debug result.to_json
-      else
-        logger.error "AVATAX_RESPONSE context=#{context} result=error reimbursement_id=#{reimbursement.id} doc_id=#{result[:doc_id]}"
-        logger.error result.to_json
-
-        raise AvataxApiError.new("#{context} error: #{result[:messages]}")
-      end
     end
 
     # see https://github.com/avadev/AvaTax-Calc-SOAP-Ruby/blob/master/GetTaxTest.rb
