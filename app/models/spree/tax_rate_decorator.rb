@@ -12,12 +12,6 @@ Spree::TaxRate.class_eval do
       # do nothing.  we'll take care of this ourselves at different points via the various hooks we have in place
     end
 
-    def store_pre_tax_amount
-      # do nothing.  this is only for "included" and we don't support included tax.
-      # also, we perform calculations at a different time.
-      # this should never be called anyway because only TaxRate.adjust calls it, but we override it just to be safe.
-    end
-
     # require exactly one tax rate.  if that's not true then alert ourselves and carry on as best we can
     def avatax_the_one_rate
       rates = all.to_a
@@ -28,11 +22,6 @@ Spree::TaxRate.class_eval do
   def adjust(order, item)
     # We've overridden the class-level TaxRate.adjust so nothing should be calling this code
     raise SpreeAvatax::TaxRateInvalidOperation.new("Spree::TaxRate#adjust should never be called when Avatax is present")
-  end
-
-  def compute_amount(item)
-    # Avatax tax adjustments should always be finalized so Spree should never attempt to call this code
-    raise SpreeAvatax::TaxRateInvalidOperation.new("Spree::TaxRate#compute_amount should never be called when Avatax is present")
   end
 
   private

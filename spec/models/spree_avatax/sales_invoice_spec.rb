@@ -200,19 +200,7 @@ describe SpreeAvatax::SalesInvoice do
           .to receive(:get_tax)
           .and_raise(error)
 
-        order.line_items.update_all(pre_tax_amount: 0)
         order.reload
-      end
-
-      it 'sets the pre_tax_amount on each line item in the order' do
-        expect{ subject }.to raise_error(error)
-        expect(order.line_items.first.pre_tax_amount.to_f).to equal(order.line_items.first.discounted_amount.to_f)
-        expect(order.line_items.last.pre_tax_amount.to_f).to equal(order.line_items.last.discounted_amount.to_f)
-      end
-
-      it 'sets the pre_tax_amount on each shipment in the order' do
-        expect{ subject }.to raise_error(error)
-        expect(order.shipments.first.pre_tax_amount.to_f).to equal(order.shipments.first.discounted_amount.to_f)
       end
 
       context 'when an error_handler is not defined' do
