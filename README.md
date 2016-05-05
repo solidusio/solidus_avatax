@@ -1,6 +1,8 @@
 Solidus Avatax
 ===========
 
+[![Build Status](https://travis-ci.org/solidusio/solidus_avatax.svg?branch=master)](https://travis-ci.org/solidusio/solidus_avatax)
+ 
 Avatax integration with Solidus.
 
 Installation
