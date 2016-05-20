@@ -6,9 +6,7 @@ Spree::Order.class_eval do
 
   state_machine.after_transition from: :address do |order, transition|
     SpreeAvatax::SalesShared.reset_tax_attributes(order)
-  end
-
-  state_machine.before_transition to: :payment do |order, transition|
+    # This needs to be called earlier because of how the checkout works on Glossier
     SpreeAvatax::SalesInvoice.generate(order)
   end
 
