@@ -2,7 +2,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = "solidus_avatax"
-  s.version     = "1.0.0"
+  s.version     = "1.1.0"
   s.summary     = "Avatax extension for Solidus"
   s.description = "Solidus extension to retrieve tax rates via Avalara's SOAP API."
   s.required_ruby_version = ">= 2.1"
