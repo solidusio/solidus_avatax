@@ -13,7 +13,7 @@ Spree::Order.class_eval do
   end
 
   state_machine.after_transition to: :complete do |order, transition|
-    SpreeAvatax::SalesInvoice.commit(order)
+     ::CommitSalesInvoiceJob.perform_later(order.id)
   end
 
   state_machine.after_transition to: :canceled do |order, transition|
