@@ -40,4 +40,12 @@ Spree::Order.class_eval do
     end
   end
 
+  def line_items_with_tax_rates
+    arr = []
+    line_items.each do |li|
+      tax_category = li.product.tax_category
+      arr << li if tax_category.tax_rates.any?
+    end
+    arr
+  end
 end
