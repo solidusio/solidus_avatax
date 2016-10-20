@@ -39,10 +39,4 @@ Spree::Order.class_eval do
       update_columns(state: 'payment', updated_at: Time.now)
     end
   end
-
-  def line_items_with_tax_rates
-    lis = line_items.select { |li| li.taxable? }
-
-    line_items.where(id: lis.map(&:id))
-  end
 end
