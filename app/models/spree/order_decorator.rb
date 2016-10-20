@@ -39,5 +39,4 @@ Spree::Order.class_eval do
       update_columns(state: 'payment', updated_at: Time.now)
     end
   end
-
 end

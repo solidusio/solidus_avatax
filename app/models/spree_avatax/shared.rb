@@ -25,7 +25,7 @@ module SpreeAvatax::Shared
     end
 
     def taxable_order?(order)
-      order.line_items.present? && order.ship_address.present?
+      order.line_items.with_tax_rates.present? && order.ship_address.present?
     end
 
     def get_tax(params)

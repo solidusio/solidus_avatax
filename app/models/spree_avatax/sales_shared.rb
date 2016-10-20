@@ -63,7 +63,7 @@ module SpreeAvatax::SalesShared
       tax_lines = Array.wrap(avatax_result[:tax_lines][:tax_line])
 
       # builds a hash like: {"L-111": {record: #<Spree::LineItem ...>}, ...}
-      data = (order.line_items + order.shipments).map { |r| [avatax_id(r), {record: r}] }.to_h
+      data = (order.line_items.with_tax_rates + order.shipments).map { |r| [avatax_id(r), {record: r}] }.to_h
 
       # adds :tax_line to each entry in the data
       tax_lines.each do |tax_line|
@@ -112,7 +112,7 @@ module SpreeAvatax::SalesShared
       destroyed_adjustments = order.all_adjustments.tax.destroy_all
       return if destroyed_adjustments.empty?
 
-      taxable_records = order.line_items + order.shipments
+      taxable_records = order.line_items.with_tax_rates + order.shipments
       taxable_records.each do |taxable_record|
         taxable_record.update_attributes!({
           additional_tax_total: 0,
@@ -174,7 +174,7 @@ module SpreeAvatax::SalesShared
     end
 
     def gettax_lines_params(order)
-      line_items = order.line_items.includes(variant: :product)
+      line_items = order.line_items.with_tax_rates.includes(variant: :product)
 
       line_item_lines = line_items.map do |line_item|
         {
