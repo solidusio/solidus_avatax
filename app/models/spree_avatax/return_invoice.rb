@@ -132,7 +132,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
       {
         doccode:       reimbursement.number,
         referencecode: reimbursement.order.number,
-        customercode:  reimbursement.order.user_id,
+        customercode:  reimbursement.order.email,
         companycode:   SpreeAvatax::Config.company_code,
 
         doctype: DOC_TYPE,
