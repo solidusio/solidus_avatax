@@ -8,10 +8,6 @@ Spree::Order.class_eval do
     SpreeAvatax::SalesShared.reset_tax_attributes(order)
   end
 
-  state_machine.after_transition from: :address, to: :delivery do |order, transition|
-    SpreeAvatax::SalesInvoice.generate(order)
-  end
-
   state_machine.after_transition to: :complete do |order, transition|
     SpreeAvatax::SalesInvoice.commit(order)
   end
