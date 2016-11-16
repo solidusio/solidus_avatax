@@ -21,7 +21,7 @@ Spree::TaxRate.class_eval do
 
   def adjust(order, item)
     # We've overridden the class-level TaxRate.adjust so nothing should be calling this code
-    raise SpreeAvatax::TaxRateInvalidOperation.new("Spree::TaxRate#adjust should never be called when Avatax is present")
+    warn SpreeAvatax::TaxRateInvalidOperation.new("Spree::TaxRate#adjust should never be called when Avatax is present")
   end
 
   private
