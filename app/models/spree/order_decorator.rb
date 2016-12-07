@@ -5,18 +5,22 @@ Spree::Order.class_eval do
   after_save :avatax_order_after_save
 
   state_machine.after_transition from: :address do |order, transition|
+    return if order.pos_order?
     SpreeAvatax::SalesShared.reset_tax_attributes(order)
   end
 
   state_machine.before_transition to: :payment do |order, transition|
+    return if order.pos_order?
     SpreeAvatax::SalesInvoice.generate(order)
   end
 
   state_machine.after_transition to: :complete do |order, transition|
+    return if order.pos_order?
      ::CommitSalesInvoiceJob.perform_later(order.id)
   end
 
   state_machine.after_transition to: :canceled do |order, transition|
+    return if order.pos_order?
     SpreeAvatax::SalesInvoice.cancel(order)
   end
 
@@ -38,6 +42,10 @@ Spree::Order.class_eval do
       Rails.logger.info "[avatax] order address change detected for order #{number} while in confirm state. resetting order state to 'payment'."
       update_columns(state: 'payment', updated_at: Time.now)
     end
+  end
+
+  def pos_order?
+    channel == 'pos'
   end
 
 end
