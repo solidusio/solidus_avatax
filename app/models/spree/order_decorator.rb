@@ -3,25 +3,21 @@ Spree::Order.class_eval do
   has_one  :avatax_sales_invoice, class_name: 'SpreeAvatax::SalesInvoice', inverse_of: :order
 
   after_save :avatax_order_after_save
-
+  
   state_machine.after_transition from: :address do |order, transition|
-    return if order.pos_order?
-    SpreeAvatax::SalesShared.reset_tax_attributes(order)
+    SpreeAvatax::SalesShared.reset_tax_attributes(order) unless order.pos_order?
   end
 
   state_machine.before_transition to: :payment do |order, transition|
-    return if order.pos_order?
-    SpreeAvatax::SalesInvoice.generate(order)
+    SpreeAvatax::SalesInvoice.generate(order) unless order.pos_order?
   end
 
   state_machine.after_transition to: :complete do |order, transition|
-    return if order.pos_order?
-     ::CommitSalesInvoiceJob.perform_later(order.id)
+     ::CommitSalesInvoiceJob.perform_later(order.id) unless order.pos_order?
   end
 
   state_machine.after_transition to: :canceled do |order, transition|
-    return if order.pos_order?
-    SpreeAvatax::SalesInvoice.cancel(order)
+    SpreeAvatax::SalesInvoice.cancel(order) unless order.pos_order?
   end
 
   # The total of discounts and charges added at the order level.
