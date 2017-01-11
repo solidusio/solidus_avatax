@@ -43,7 +43,6 @@ module SpreeAvatax::SalesShared
           finalized:  true, # this tells spree not to automatically recalculate avatax tax adjustments
         })
 
-        Spree::ItemAdjustments.new(record).update
         record.save!
       end
 
@@ -119,9 +118,6 @@ module SpreeAvatax::SalesShared
           adjustment_total: 0,
           included_tax_total: 0,
         })
-
-        Spree::ItemAdjustments.new(taxable_record).update
-        taxable_record.save!
       end
 
       order.update_attributes!({
