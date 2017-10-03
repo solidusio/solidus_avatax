@@ -1,9 +1,14 @@
-Spree::Tax::OrderAdjuster.class_eval do
-  def adjust_with_avatax!
-    # do nothing. we hook in in our own ways.
-    # TODO: See if we can make OrderAdjuster pluggable and workable for what we
-    # need to do.
+module SpreeAvatax
+  module Extensions
+    module Tax
+      module OrderAdjuster
+        def adjust!
+          super if rates_for_order_zone(order).avatax.none?
+        end
+      end
+    end
   end
-
-  alias_method_chain :adjust!, :avatax
 end
+
+::Spree::Tax::OrderAdjuster.prepend \
+  SpreeAvatax::Extensions::Tax::OrderAdjuster
