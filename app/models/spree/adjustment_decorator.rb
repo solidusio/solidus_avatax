@@ -25,7 +25,7 @@ module SpreeAvatax
       private
 
       def avatax?
-        tax? && self.source.avatax?
+        tax? && self.source && self.source.avatax?
       end
     end
   end
