@@ -10,10 +10,6 @@ module SpreeAvatax
           SpreeAvatax::SalesShared.reset_tax_attributes(order)
         end
 
-        base.state_machine.before_transition to: :payment do |order, transition|
-          SpreeAvatax::SalesInvoice.generate(order)
-        end
-
         base.state_machine.after_transition to: :complete do |order, transition|
           ::CommitSalesInvoiceJob.perform_later(order.id)
         end
@@ -46,7 +42,6 @@ module SpreeAvatax
       def pos_order?
         channel == 'pos'
       end
-
     end
   end
 end

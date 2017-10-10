@@ -5,6 +5,10 @@ describe Spree::Order do
 
   let!(:order) { create(:order_with_line_items, line_items_count: 1) }
 
+  before do
+    Spree::TaxRate.update_all(zone_id: order.tax_zone.id)
+  end
+
   context 'after_save' do
     context 'when something unimportant changes' do
       context 'when in confirm state' do
@@ -50,8 +54,18 @@ describe Spree::Order do
       subject.update_attributes!(state: 'address')
     end
 
+    before do
+      allow(SpreeAvatax::SalesInvoice).to receive(:generate)
+      allow(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes)
+    end
+
     it "clears tax" do
       expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
+      subject.next!
+    end
+
+    it "generates a sales invoice" do
+      expect(SpreeAvatax::SalesInvoice).to receive(:generate).with(order)
       subject.next!
     end
   end

@@ -14,13 +14,6 @@ module SpreeAvatax
           [avatax_the_one_rate]
         end
 
-        def adjust(order, items)
-          return if avatax?
-
-          super
-          # do nothing.  we'll take care of this ourselves at different points via the various hooks we have in place
-        end
-
         # require exactly one tax rate.  if that's not true then alert ourselves and carry on as best we can
         def avatax_the_one_rate
           rates = all.to_a
@@ -37,10 +30,9 @@ module SpreeAvatax
         end
       end
 
-      def adjust(order, item)
+      def adjust(order_tax_zone, item)
         if self.avatax?
-          # We've overridden the class-level TaxRate.adjust so nothing should be calling this code
-          raise SpreeAvatax::TaxRateInvalidOperation.new("Spree::TaxRate#adjust should never be called when Avatax is present")
+          SpreeAvatax::SalesInvoice.generate(item.order)
         else
           super
         end
