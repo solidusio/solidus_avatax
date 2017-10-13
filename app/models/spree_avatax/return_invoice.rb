@@ -31,10 +31,11 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
     # After the reimbursement completes the ".finalize" method will get called and we'll commit the
     #   return invoice.
     def generate(reimbursement)
-      if !SpreeAvatax::Config.enabled
+      if !SpreeAvatax::Config.enabled 
         logger.info("Avatax disabled. Skipping ReturnInvoice.generate for reimbursement #{reimbursement.number}")
         return
       end
+      return if !north_american_order?(reimbursement) || no_sales_receipt(reimbursement)
 
       success_result = get_tax(reimbursement)
 
@@ -90,6 +91,14 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
     end
 
     private
+
+    def no_sales_receipt?(reimbursement)
+      reimbursement.order.avatax_sales_invoice.nil?
+    end
+
+    def north_american_order?(reimbursement)
+      [1,2].include?(reimbursement.order.store_id)
+    end
 
     def get_tax(reimbursement)
       params = get_tax_params(reimbursement)
