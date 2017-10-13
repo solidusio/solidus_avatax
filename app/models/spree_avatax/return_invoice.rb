@@ -35,7 +35,7 @@ class SpreeAvatax::ReturnInvoice < ActiveRecord::Base
         logger.info("Avatax disabled. Skipping ReturnInvoice.generate for reimbursement #{reimbursement.number}")
         return
       end
-      return if !north_american_order?(reimbursement) || no_sales_receipt(reimbursement)
+      return if !north_american_order?(reimbursement) || no_sales_receipt?(reimbursement)
 
       success_result = get_tax(reimbursement)
 
