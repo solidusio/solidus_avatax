@@ -11,7 +11,7 @@ describe SpreeAvatax::ReturnInvoice do
       {
         doccode:       reimbursement.number,
         referencecode: reimbursement.order.number,
-        customercode:  reimbursement.order.user_id,
+        customercode:  reimbursement.order.user.email,
         companycode:   SpreeAvatax::Config.company_code,
 
         doctype: SpreeAvatax::ReturnInvoice::DOC_TYPE,

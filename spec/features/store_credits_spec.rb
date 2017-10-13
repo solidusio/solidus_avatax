@@ -16,6 +16,8 @@ RSpec.describe "Taxes with Store Credits" do
     country = FactoryGirl.create(:country, name: "Tatooine")
     zone.members << Spree::ZoneMember.create(zoneable: country)
 
+    Spree::TaxRate.update_all(zone_id: zone.id)
+
     # Product, payment method and shipping method
     FactoryGirl.create(:credit_card_payment_method)
     FactoryGirl.create(:store_credit_payment_method)
@@ -43,23 +45,23 @@ RSpec.describe "Taxes with Store Credits" do
 
       click_button "Checkout"
 
-      # Address
-      within("#billing") do
-        fill_in "First Name", with: "Han"
-        fill_in "Last Name", with: "Solo"
-        fill_in "Street Address", with: "YT-1300"
-        fill_in "City", with: "Mos Eisley"
-        select "United States of America", from: "Country"
-        fill_in "order_bill_address_attributes_state_name", with: "Tatooine"
-        fill_in "Zip", with: "12010"
-        fill_in "Phone", with: "(555) 555-5555"
-      end
-      click_on "Save and Continue"
     end
 
     it "adjusts the credits to cover taxes" do
       # Use a cassette so that we don't hit the Avatax API all of the time.
       VCR.use_cassette("taxes_with_store_credits") do
+        # Address
+        within("#billing") do
+          fill_in "First Name", with: "Han"
+          fill_in "Last Name", with: "Solo"
+          fill_in "Street Address", with: "YT-1300"
+          fill_in "City", with: "Mos Eisley"
+          select "United States of America", from: "Country"
+          fill_in "order_bill_address_attributes_state_name", with: "Tatooine"
+          fill_in "Zip", with: "12010"
+          fill_in "Phone", with: "(555) 555-5555"
+        end
+
         expect(SpreeAvatax::SalesShared).to(
           receive(:avatax_id).
             with(an_instance_of(Spree::LineItem)).
@@ -73,7 +75,9 @@ RSpec.describe "Taxes with Store Credits" do
             and_return('Spree::Shipment-1')
         )
 
-        click_on "Save and Continue"
+        2.times do
+          click_on "Save and Continue"
+        end
       end
 
       # Enter credit card details. Won't let us continue without it.

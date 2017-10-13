@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
   s.requirements << "none"
 
-  s.add_dependency "solidus_core", ">= 1.3.0.alpha", "< 1.4"
-  s.add_dependency "hashie",      "~> 2.l.5"
+  s.add_dependency "solidus_core", [">= 1.1", "< 3"]
+  s.add_dependency "hashie",      ">= 3"
   s.add_dependency "multi_json"
   s.add_dependency "Avatax_TaxService", "~> 2.0.0"
 

@@ -28,7 +28,7 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
         return
       end
 
-      return if order.completed? || !SpreeAvatax::Shared.taxable_order?(order)
+      return if order.completed? || !SpreeAvatax::Shared.taxable_order?(order) || order.pos_order?
 
       result = SpreeAvatax::SalesShared.get_tax(order, DOC_TYPE)
       # run this immediately to ensure that everything matches up before modifying the database
@@ -89,6 +89,7 @@ class SpreeAvatax::SalesInvoice < ActiveRecord::Base
     end
 
     def cancel(order)
+      return if order.pos_order?
       if !SpreeAvatax::Config.enabled
         logger.info("Avatax disabled. Skipping SalesInvoice.cancel for order #{order.number}")
         return

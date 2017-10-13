@@ -95,7 +95,7 @@ module SpreeAvatax::SalesShared
     #
     # @param order [Spree::Order] the order
     def reset_tax_attributes(order)
-      return if order.completed?
+      return if order.completed? || order.pos_order?
 
       # Delete the avatax_sales_invoice to avoid accidentally committing it
       # later.
