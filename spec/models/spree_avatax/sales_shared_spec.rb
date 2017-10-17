@@ -20,14 +20,15 @@ describe SpreeAvatax::SalesShared do
     before do
       line_item.update_attributes!(quantity: 2)
 
-      line_item.adjustments.eligible.tax.additional.create!({
-        adjustable: line_item,
-        amount: 1.23,
-        order: order,
-        label: 'Previous Tax',
-        included: false,
-        finalized: true,
-      })
+
+      line_item.adjustments.eligible.tax.additional << \
+        create(:tax_adjustment,
+               adjustable: line_item,
+               amount: 1.23,
+               order: order,
+               label: 'Previous Tax',
+               included: false,
+               finalized: true)
 
       line_item.update_attributes!({
         additional_tax_total: 1,

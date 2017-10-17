@@ -13,6 +13,10 @@ class SpreeAvatax::Calculator < Spree::Calculator
     Spree.t(:avatax_description)
   end
 
+  def avatax?
+    true
+  end
+
   def compute(computable)
     if computable.is_a?(Spree::ShippingRate)
       0

@@ -93,7 +93,7 @@ describe SpreeAvatax::ShortShipReturnInvoice do
 
               taxoverridetypeline: SpreeAvatax::ShortShipReturnInvoice::TAX_OVERRIDE_TYPE,
               reasonline:          SpreeAvatax::ShortShipReturnInvoice::TAX_OVERRIDE_REASON,
-              taxamountline:       -1.to_d,
+              taxamountline:       0.to_d,
               taxdateline:         now.to_date,
 
               description: REXML::Text.normalize(inventory_unit_1.line_item.variant.product.description[0...100]),
