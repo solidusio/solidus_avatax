@@ -2,8 +2,10 @@ Solidus Avatax
 ===========
 
 [![Build Status](https://travis-ci.org/solidusio/solidus_avatax.svg?branch=master)](https://travis-ci.org/solidusio/solidus_avatax)
- 
+
 Avatax integration with Solidus.
+
+**WARNING**: Currently, Solidus Team is not supporting this extension. If you need to implement Avalara AvaTax functionality into your store, please have a look at [solidus_avatax_certified](https://github.com/boomerdigital/solidus_avatax_certified) by Boomer Digital.
 
 Installation
 ------------
