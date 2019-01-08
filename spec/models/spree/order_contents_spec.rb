@@ -7,7 +7,7 @@ describe Spree::OrderContents do
   describe 'add_with_avatax' do
     let(:variant) { create :variant }
 
-    subject { order_contents.add_with_avatax(variant) }
+    subject { order_contents.add(variant) }
 
     it 'clears tax' do
       expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
@@ -16,7 +16,7 @@ describe Spree::OrderContents do
   end
 
   describe 'remove_with_avatax' do
-    subject { order_contents.remove_with_avatax(order.line_items.first.variant) }
+    subject { order_contents.remove(order.line_items.first.variant) }
 
     it 'recomputes tax' do
       expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
@@ -25,7 +25,7 @@ describe Spree::OrderContents do
   end
 
   describe 'update_cart_with_avatax' do
-    subject { order_contents.update_cart_with_avatax({}) }
+    subject { order_contents.update_cart({}) }
 
     it 'recomputes tax' do
       expect(SpreeAvatax::SalesShared).to receive(:reset_tax_attributes).with(order)
